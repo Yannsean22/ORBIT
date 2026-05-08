@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZAIRE – Dashboard</title>
+  <link rel="stylesheet" href="./dashStyle.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- CONFIRMATION MODAL -->
+    <div class="confirm-overlay hidden" id="confirm-overlay">
+      <div class="confirm-panel">
+        <div class="confirm-icon" id="confirm-icon">&#9888;</div>
+        <div class="confirm-title" id="confirm-title">Are you sure?</div>
+        <div class="confirm-subtitle" id="confirm-subtitle"></div>
+        <div class="confirm-btns">
+          <button class="confirm-btn confirm-btn--cancel" id="confirm-cancel">Cancel</button>
+          <button class="confirm-btn confirm-btn--confirm" id="confirm-ok">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="dash-header">
+      <div class="dash-header-left">
+        <div class="dash-username" id="dash-username">Rider</div>
+        <div class="dash-subtitle" id="dash-subtitle">ZAIRE overview</div>
+      </div>
+      <div class="dash-header-right">
+        <div class="dash-avatar" id="dash-avatar"><span>R</span></div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <main class="dash-grid" id="dashboard-view">
+
+    <!-- I COULD HAVE HAD THE USER CHOOSE SOME NETWORK BUT THIS WAS A GIFT SO I DID NOT WANT TO GO TOO IN DEPTH AND HAD OTHER THINGS GOING ON -->
+      <div class="wifi-connect-card">
+
+      <div class="wifi-connect-header">
+        <div class="wifi-connect-title">Wi-Fi Setup</div>
+        <div class="wifi-connect-subtitle">
+          Connect your device to a wireless network
+        </div>
+      </div>
+
+      <input
+        type="text"
+        class="wifi-input"
+        id="dashboard-device-name"
+        value=""
+        placeholder="ENTER YOUR WIFI ID"
+      />
+
+      <input
+        type="password"
+        class="wifi-input"
+        id="dashboard-device-pass"
+        value=""
+        placeholder="ENTER YOUR WIFI PASSWORD"
+      />
+
+      <button class="wifi-btn">
+        FIND NETWORK
+      </button>
+
+    </div>
+
+      <div class="leave-portal-wrap">
+        <button id="leave-portal-btn" class="leave-portal-btn">
+          Leave Portal
+        </button>
+      </div>
+
+    </main>
+
+    <!-- SETTINGS VIEW -->
+    <section class="settings-view hidden" id="settings-view">
+
+      <!-- Header: Edit toggle + Save -->
+      <div class="settings-header-row">
+        <div class="settings-edit-row">
+          <label class="toggle-switch">
+            <input type="checkbox" id="settings-edit-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+          <span class="settings-edit-label">Edit Settings</span>
+        </div>
+        <button class="settings-save-btn hidden" id="settings-save-btn">
+          Save settings
+        </button>
+      </div>
+
+      <!-- USER / DEVICE -->
+      <div class="detail-header" style="margin-top:8px;">
+        <div>
+          <div class="detail-subtitle">User & Device</div>
+        </div>
+      </div>
+
+      <div class="settings-name-wrap">
+        <input
+          type="text"
+          class="settings-name-input"
+          id="settings-name-input"
+          value="RIDER"
+          disabled
+          placeholder="User name"
+        />
+      </div>
+
+      <div class="settings-name-wrap">
+        <input
+          type="text"
+          class="settings-name-input"
+          id="settings-device-name-input"
+          value="ZAIRE"
+          disabled
+          placeholder="Device name"
+        />
+      </div>
+
+      <!-- GENERAL SETTINGS -->
+      <div class="detail-header" style="margin-top:10px;">
+        <div>
+          <div class="detail-subtitle">General Preferences</div>
+        </div>
+      </div>
+
+      <!-- LANGUAGE -->
+      <div class="settings-row">
+        <span class="settings-label">Language</span>
+        <select id="settings-language" class="settings-select" disabled>
+          <option style="color:black;" value="ar">Arabic (عربي)</option>
+          <option style="color:black;" value="es">Spanish (Español)</option>
+          <option style="color:black;" value="en">English</option>
+          <option style="color:black;" value="cn">Chinese (中文)</option>
+          <option style="color:black;" value="fr">French (Français)</option>
+          <option style="color:black;" value="hi">Hindi (हिन्दी)</option>
+          <option style="color:black;" value="jp">Japanese (日本語)</option>
+          <option style="color:black;" value="kr">Korean (한국어)</option>
+          <option style="color:black;" value="pt">Portuguese (Português)</option>
+          <option style="color:black;" value="ru">Russian (Русский)</option>
+        </select>
+      </div>
+
+      <!-- Units -->
+      <div class="settings-row">
+        <span class="settings-label">Units</span>
+        <select id="settings-units" class="settings-select" disabled>
+          <option style="color:black;" value="0">Metric</option>
+          <option style="color:black;" value="1">Imperial</option>
+        </select>
+      </div>
+
+      <!-- Theme -->
+      <div class="settings-row">
+        <span class="settings-label">Theme</span>
+        <select id="settings-theme" class="settings-select" disabled>
+          <option style="color:black;" value="1">Dark</option>
+          <option style="color:black;" value="0">Light</option>
+        </select>
+      </div>
+
+      <!-- Theme -->
+      <div class="settings-row">
+        <span class="settings-label">F1</span>
+        <select id="settings-f1" class="settings-select" disabled>
+          <option style="color:red;" value="1">FERRARI</option>
+          <option style="color: orange;" value="0">MCLAREN</option>
+        </select>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="hidden" id="danger-zone-card">
+
+        <!-- PASSCODE -->
+        <div class="detail-header" style="margin-top:10px;">
+          <div>
+            <div class="detail-subtitle">Security</div>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-label">Change Passcode</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="settings-passcode-toggle" disabled />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+
+        <div id="settings-passcode-fields" class="hidden">
+          <input
+            type="password"
+            class="settings-input"
+            id="settings-passcode-new"
+            placeholder="New passcode"
+            maxlength="6"
+          />
+          <input
+            type="password"
+            class="settings-input"
+            id="settings-passcode-confirm"
+            placeholder="Confirm passcode"
+            maxlength="6"
+          />
+          <button class="settings-save-btn" id="settings-passcode-save">
+            Save Passcode
+          </button>
+        </div>
+
+        <div class="detail-header" style="margin-top:16px;">
+          <div>
+            <div class="detail-subtitle" style="color:#ff6b6b;">Danger Zone</div>
+          </div>
+        </div>
+
+        <div class="danger-zone-item">
+          <div class="danger-zone-text">
+            <span class="settings-label settings-label--danger">Restore Defaults</span>
+            <div class="settings-row-note">
+              Resets system behavior while keeping user name, device name, theme, and units.
+            </div>
+          </div>
+          <button class="settings-danger-btn" id="settings-restore-defaults-btn" disabled>
+            Restore
+          </button>
+        </div>
+
+        <div class="danger-zone-divider"></div>
+
+        <div class="danger-zone-item">
+          <div class="danger-zone-text">
+            <span class="settings-label settings-label--danger">Factory Reset</span>
+            <div class="settings-row-note">
+              Erases all saved settings and returns device to first setup.
+            </div>
+          </div>
+          <button class="settings-danger-btn" id="settings-factory-reset-btn" disabled>
+            Factory Reset
+          </button>
+        </div>
+
+      </div>
+
+      <!-- DEVICE INFO -->
+      <div class="detail-header" style="margin-top:16px;">
+        <div>
+          <div class="detail-subtitle">Device Info</div>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Manufacturer</span>
+        <span class="settings-label" id="manufacturer-label">zaire systems</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Model Name</span>
+        <span class="settings-label" id="model-name-label">snowman</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Firmware Version</span>
+        <span class="settings-label" id="firmware-version">v1.0.0</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Build Date</span>
+        <span class="settings-label" id="build-date">2026-04-30</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Device ID</span>
+        <span class="settings-label" id="device-id">ZAIRE-XXXXXX</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Hardware Rev</span>
+        <span class="settings-label" id="hardware-rev">V1.0</span>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Bluetooth Version</span>
+        <span class="settings-label" id="bluetooth-version">V5.1</span>
+      </div>
+
+    </section>
+
+    <!-- BOTTOM NAV -->
+    <nav class="dash-nav">
+      <button class="nav-item nav-item--active" id="nav-dashboard">
+        <span class="nav-icon">&#128202;</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-item" id="nav-settings">
+        <span class="nav-icon">&#9881;</span>
+        <span class="nav-label">Settings</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script src="../globalData.js"></script>
+  <script src="./data.js"></script>
+</body>
+</html>

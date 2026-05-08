@@ -1,0 +1,326 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ORBIT</title>
+
+  <!-- ESP32 httpd serves this at /style.css -->
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="./favicon.ico" />
+</head>
+
+<body>
+  <div class="container" id="home-root">
+
+    <!-- ORBIT logo -->
+    <div class="logo">
+      <span class="letter letter-o">O</span>
+      <span class="letter letter-r">R</span>
+      <span class="letter letter-b orbit-bit">B</span>
+      <span class="letter letter-i i orbit-bit">I</span>
+      <span class="letter letter-t orbit-bit">T</span>
+    </div>
+
+    <!-- Splash: welcome + enter button (multi-language cycle handled in JS) -->
+    <h1 class="welcome-title">WELCOME</h1>
+    <button class="enter-btn" id="home-start-btn">ENTER</button>
+
+    <!-- STEP 0: LANGUAGE SELECTOR (first_boot only, shown after ENTER) -->
+    <div class="language-select hidden" id="language-select">
+      <div class="language-card wizard-card">
+        <p class="wizard-title" data-i18n="lang_title">
+          Choose your language.
+        </p>
+        <p class="wizard-subtitle" data-i18n="lang_subtitle">
+          We’ll use this across your device experience.
+        </p>
+
+        <ul class="language-list">
+          <li class="language-option"
+              data-lang="ar"
+              data-continue-label="استمرار">العربية</li>
+
+          <li class="language-option"
+              data-lang="es"
+              data-continue-label="Continuar">Español</li>
+
+          <li class="language-option"
+              data-lang="en"
+              data-continue-label="Get Started">English</li>
+
+          <li class="language-option"
+              data-lang="cn"
+              data-continue-label="继续">中文</li>
+
+          <li class="language-option"
+              data-lang="fr"
+              data-continue-label="Continuer">Français</li>
+
+          <li class="language-option"
+              data-lang="hi"
+              data-continue-label="जारी रखें">हिन्दी</li>
+
+          <li class="language-option"
+              data-lang="jp"
+              data-continue-label="続行">日本語</li>
+
+          <li class="language-option"
+              data-lang="kr"
+              data-continue-label="계속">한국어</li>
+
+          <li class="language-option"
+              data-lang="pt"
+              data-continue-label="Continuar">Português</li>
+
+          <li class="language-option"
+              data-lang="ru"
+              data-continue-label="Продолжить">Русский</li>
+        </ul>
+
+        <button class="lang-continue-btn hidden" id="language-continue" data-i18n="btn_lang_continue">
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN ONBOARDING TITLE (used after language has been chosen) -->
+    <h2 class="wizard-main-title hidden" data-i18n="main_title">
+      Let’s get your device ready.
+    </h2>
+
+    <!-- STEP 1: USER NAME -->
+    <div class="wizard-card hidden" id="name-card">
+      <p class="wizard-title" data-i18n="name_title">What should we call you?</p>
+      <p class="wizard-subtitle" data-i18n="name_subtitle">
+        This name will appear in your device settings.
+      </p>
+
+      <input
+        type="text"
+        id="user-name-input"
+        class="text-input"
+        data-i18n-placeholder="name_placeholder"
+        placeholder="Your name"
+        autocomplete="name"
+      />
+
+      <div class="wizard-error" id="name-error"></div>
+
+      <!-- Back to language selector -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="name-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn" id="name-continue" data-i18n="btn_continue">
+        Continue
+      </button>
+    </div>
+
+    <!-- STEP 2: DEVICE NAME -->
+    <div class="wizard-card hidden" id="device-name-card">
+      <p class="wizard-title" data-i18n="device_title">Name your device.</p>
+      <p class="wizard-subtitle" data-i18n="device_subtitle">
+        You’ll see this name when connecting to the device.
+      </p>
+
+      <input
+        type="text"
+        id="device-name-input"
+        class="text-input"
+        placeholder="ORBIT"
+        autocomplete="off"
+      />
+
+      <div class="wizard-error" id="device-name-error"></div>
+
+      <!-- Back to name -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="device-name-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn" id="device-name-continue" data-i18n="btn_continue">
+        Continue
+      </button>
+    </div>
+
+    <!-- STEP 3: UNITS -->
+    <div class="wizard-card hidden" id="units-card">
+      <p class="wizard-title" data-i18n="units_title">Choose your team.</p>
+      <p class="wizard-subtitle" data-i18n="units_subtitle">
+        We’ll use this for F1 showcase
+      </p>
+
+      <div class="units-options">
+        <button class="unit-option" data-units="metric">
+          <span data-i18n="units_metric_label">MCLAREN</span><br>
+        </button>
+        <button class="unit-option" data-units="imperial">
+          <span data-i18n="units_imperial_label">FERRARI</span><br>
+        </button>
+      </div>
+
+      <div class="wizard-error" id="units-error"></div>
+
+      <!-- Back to device name -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="units-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn hidden" id="units-continue" data-i18n="btn_continue">
+        Continue
+      </button>
+    </div>
+
+    <!-- STEP 4: THEME -->
+    <div class="wizard-card hidden" id="theme-card">
+      <p class="wizard-title" data-i18n="theme_title">Pick your screen theme.</p>
+      <p class="wizard-subtitle" data-i18n="theme_subtitle">
+        You can change this later in settings.
+      </p>
+
+      <div class="theme-options">
+        <div class="theme-option" data-theme="dark">
+          <div class="theme-preview theme-dark"></div>
+          <span class="theme-label" data-i18n="theme_dark_label">Dark</span>
+        </div>
+        <div class="theme-option" data-theme="light">
+          <div class="theme-preview theme-light"></div>
+          <span class="theme-label" data-i18n="theme_light_label">Light</span>
+        </div>
+      </div>
+
+      <div class="wizard-error" id="theme-error"></div>
+
+      <!-- Back to units -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="theme-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn hidden" id="theme-continue" data-i18n="btn_continue">
+        Continue
+      </button>
+    </div>
+
+    <!-- STEP 5: CREATE + CONFIRM PASSCODE -->
+    <div class="wizard-card hidden" id="new-passcode-card">
+      <p class="wizard-title" data-i18n="passcode_title">Create a passcode.</p>
+      <p class="wizard-subtitle" data-i18n="passcode_subtitle">
+        Choose a 6-digit code to unlock your device.
+      </p>
+
+      <input
+        type="password"
+        id="new-passcode-input"
+        class="passcode-input"
+        inputmode="numeric"
+        pattern="\d*"
+        maxlength="6"
+        placeholder="******"
+        autocomplete="off"
+      />
+
+      <input
+        type="password"
+        id="new-passcode-confirm-input"
+        class="passcode-input passcode-confirm-input"
+        inputmode="numeric"
+        pattern="\d*"
+        maxlength="6"
+        data-i18n-placeholder="passcode_confirm_placeholder"
+        placeholder="Confirm ******"
+        autocomplete="off"
+      />
+
+      <div class="wizard-error" id="new-passcode-error"></div>
+
+      <!-- Back to theme -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="new-passcode-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn" id="new-passcode-continue" data-i18n="btn_continue">
+        Continue
+      </button>
+    </div>
+
+    <!-- STEP 6: RECOVERY NUMBER (0–9) -->
+    <div class="wizard-card hidden" id="recovery-card">
+      <p class="wizard-title" data-i18n="recovery_title">Recovery number.</p>
+      <p class="wizard-subtitle" data-i18n="recovery_subtitle">
+        Choose a single number from 0–9.<br>
+        We’ll use it to help recover your passcode.
+      </p>
+
+      <div class="recovery-options">
+        <button class="recovery-digit" data-digit="0">0</button>
+        <button class="recovery-digit" data-digit="1">1</button>
+        <button class="recovery-digit" data-digit="2">2</button>
+        <button class="recovery-digit" data-digit="3">3</button>
+        <button class="recovery-digit" data-digit="4">4</button>
+        <button class="recovery-digit" data-digit="5">5</button>
+        <button class="recovery-digit" data-digit="6">6</button>
+        <button class="recovery-digit" data-digit="7">7</button>
+        <button class="recovery-digit" data-digit="8">8</button>
+        <button class="recovery-digit" data-digit="9">9</button>
+      </div>
+
+      <div class="wizard-error" id="recovery-error"></div>
+
+      <!-- Back to passcode -->
+      <button class="wizard-back-btn" data-i18n="btn_back" id="recovery-back">
+        Back
+      </button>
+
+      <button class="wizard-continue-btn" id="recovery-continue" data-i18n="btn_finish">
+        Finish setup
+      </button>
+
+    </div>
+
+        <!-- STEP 7: SAVING / FINALIZING -->
+    <!-- STEP 7: SAVING / FINALIZING -->
+    <div class="wizard-card hidden saving-card" id="saving-card">
+      <div class="saving-spinner"></div>
+
+      <p class="wizard-title" data-i18n="saving_title">
+        Setting things up…
+      </p>
+
+      <p class="wizard-subtitle" data-i18n="saving_subtitle">
+        Saving your preferences and preparing your ORBIT interface.
+      </p>
+    </div>
+
+
+    <!-- LOGIN PASSCODE CARD (non-first_boot flow) -->
+    <div class="passcode-card hidden" id="passcode-card">
+      <p class="passcode-title" data-i18n="login_title">Enter Passcode</p>
+      <p class="passcode-subtitle" data-i18n="login_subtitle">
+        Enter your 6-digit code to continue.
+      </p>
+
+      <input
+        type="password"
+        id="passcode-input"
+        class="passcode-input"
+        inputmode="numeric"
+        pattern="\d*"
+        maxlength="6"
+        placeholder="******"
+        autocomplete="off"
+      />
+
+      <div class="passcode-error" id="passcode-error"></div>
+
+      <button class="passcode-button" id="passcode-button" data-i18n="btn_unlock">
+        UNLOCK
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ESP32 httpd serves this at /script.js -->
+  <script src="./globalData.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

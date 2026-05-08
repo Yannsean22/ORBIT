@@ -1,0 +1,734 @@
+/* ------------------------------
+   BASE PAGE LAYOUT / STYLE
+------------------------------- */
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: #000;              /* PURE BLACK */
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow-x: hidden;
+    overflow-y: auto;              /* allow scrolling if needed */
+}
+
+
+
+.container {
+    text-align: center;
+    position: relative;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ------------------------------
+   LOGO BASE STYLE
+------------------------------- */
+
+.logo {
+    font-size: 4rem;
+    font-weight: 700;
+    display: flex;
+    gap: 0.18em;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    margin-bottom: 20px;
+}
+
+/* Static logo variant for future use */
+.logo-std {
+    font-size: 4rem;
+    font-weight: 700;
+    display: flex;
+    gap: 0.18em;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    margin-bottom: 20px;
+}
+
+.i-std {
+    color: #ff7a00;
+}
+
+/* Default letter style before animation */
+.logo .letter {
+    display: inline-block;
+    transform: scale(0);
+    opacity: 0;
+}
+
+/* ORBIT accent style + smooth scaling */
+.logo .i {
+    color: #ff7a00;
+    transition: transform 0.3s ease;
+}
+
+
+/* Orange accent for the BIT section of ORBIT */
+.logo .orbit-bit {
+    color: #ff7a00;
+    text-shadow: 0 0 8px rgba(255, 122, 0, 0.55);
+}
+
+/* Final “stand out” scale for the I in BIT */
+.logo .i.i-highlight {
+    transform: scale(1.4);   /* clearly larger than others */
+}
+
+/* Move logo up for language/passcode/wizard state */
+.logo.shift-up {
+    transform: none;
+    transition: none;
+}
+
+/* ------------------------------
+   ANIMATIONS
+------------------------------- */
+
+/* Letter pop-in animation */
+.logo .letter--show {
+    animation: orbitLetterPop 0.35s ease-out forwards;
+}
+
+/* O → R → B → I → T pop effect */
+@keyframes orbitLetterPop {
+    0% {
+        transform: scale(2.8);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* WELCOME + ENTER initially hidden (fade in) */
+.welcome-title,
+.enter-btn {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* When JS activates them */
+.welcome-title.show,
+.enter-btn.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ------------------------------
+   ENTER BUTTON
+------------------------------- */
+
+.enter-btn {
+    margin-top: 25px;
+    padding: 10px 40px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #ff7a00;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.enter-btn:hover {
+    background: #ff9a33;
+    transform: scale(1.05);
+}
+
+/* Signup button (kept for possible reuse) */
+.signup-btn {
+    margin-top: 25px;
+    padding: 10px 40px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #ff7a00;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.signup-btn:hover {
+    background: #ff9a33;
+    transform: scale(1.05);
+}
+
+/* ------------------------------
+   GENERIC WIZARD CARD
+------------------------------- */
+
+.wizard-card {
+    margin-top: 24px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #141414;  /* slightly grey on black */
+    border-radius: 14px;
+    padding: 20px 22px 22px;
+    min-width: 260px;
+    max-width: 320px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: left;
+}
+
+.wizard-title {
+    margin: 0 0 6px;
+    font-size: 1.2rem;
+}
+
+.wizard-subtitle {
+    margin: 0 0 14px;
+    font-size: 0.85rem;
+    color: #cccccc;
+}
+
+.text-input {
+    width: 100%;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #111;
+    color: #fff;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    outline: none;
+    text-align: center;       /* CENTER text in all text boxes */
+}
+
+.text-input::placeholder {
+    color: #555;
+}
+
+.text-input:focus {
+    border-color: #ff7a00;
+}
+
+.wizard-error {
+    min-height: 18px;
+    font-size: 0.8rem;
+    color: #ff4c4c;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.wizard-continue-btn {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 999px;
+    border: none;
+    background: #ff7a00;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    float: right;
+}
+
+.wizard-continue-btn:hover {
+    background: #ff9a33;
+    transform: translateY(-1px);
+}
+
+/* 👇 NEW: Back button styling */
+.wizard-back-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #555;
+    background: transparent;
+    color: #ffffff;
+    font-weight: normal;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+    float: left;
+}
+
+.wizard-back-btn:hover {
+    background: #333;
+    border-color: #777;
+    transform: translateY(-1px);
+}
+
+/* Clear float if needed */
+.wizard-card::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+/* ------------------------------
+   LANGUAGE SELECTION
+------------------------------- */
+
+.language-select {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.language-card {
+    position: relative; /* for its own button if needed */
+
+    /* 👇 NEW: prevent it from growing beyond the screen */
+    max-height: 70vh;
+    overflow-y: auto;
+
+    /* 👇 NEW: extra padding so the bottom "Continue" button
+       doesn't overlap content when you scroll */
+    padding-bottom: 56px;
+}
+
+.language-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch; /* full width in card */
+}
+
+.language-option {
+    font-size: 1rem;
+    cursor: pointer;
+    color: #f5f5f5;
+    opacity: 0.9;
+    transition: color 0.2s ease,
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                background-color 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.language-option:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+    background-color: #1f1f1f;
+}
+
+.language-option.selected {
+    background-color: #ff7a00; /* blue background when selected */
+    color: #ffffff;
+    opacity: 1;
+}
+
+/* Continue button pinned to bottom-right of card */
+.lang-continue-btn {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    padding: 8px 22px;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    border: none;
+    background: #ff7a00;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+    transition: background 0.2s ease,
+                transform 0.2s ease,
+                opacity 0.2s ease;
+    opacity: 0.95;
+    z-index: 1;
+}
+
+.lang-continue-btn:hover {
+    background: #ff9a33;
+    transform: translateY(-1px);
+}
+
+/* ------------------------------
+   UNITS OPTIONS
+------------------------------- */
+
+.units-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+.unit-option {
+    flex: 1;
+    background: #111;
+    border-radius: 10px;
+    border: 1px solid #333;
+    padding: 10px 8px;
+    color: #f5f5f5;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.unit-option:hover {
+    background: #1c1c1c;
+    transform: translateY(-1px);
+}
+
+.unit-option.selected {
+    background: #ff7a00;
+    border-color: #ff7a00;
+    color: #fff;
+}
+
+.units-note {
+    font-size: 0.75rem;
+    color: #cccccc;
+}
+
+/* ------------------------------
+   THEME OPTIONS
+------------------------------- */
+
+.theme-options {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    margin-bottom: 14px;
+    justify-content: center;
+}
+
+.theme-option {
+    cursor: pointer;
+    text-align: center;
+    flex: 1;
+    max-width: 130px;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #111;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-option:hover {
+    background: #1c1c1c;
+    transform: translateY(-1px);
+}
+
+.theme-option.selected {
+    background: #ff7a00;
+    border-color: #ff7a00;
+}
+
+.theme-preview {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+.theme-dark {
+    background: linear-gradient(135deg, #050505, #222);
+}
+
+.theme-light {
+    background: linear-gradient(135deg, #f5f5f5, #cccccc);
+}
+
+.theme-label {
+    font-size: 0.9rem;
+}
+
+/* ------------------------------
+   PASSCODE INPUT (shared style)
+------------------------------- */
+
+.passcode-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #111;
+    color: #fff;
+    font-size: 1.1rem;
+    letter-spacing: 0.25em;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin-bottom: 8px;
+}
+
+.passcode-input::placeholder {
+    color: #444;
+    letter-spacing: 0.3em;
+}
+
+.passcode-input:focus {
+    border-color: #ff7a00;
+}
+
+/* Slight spacing between main + confirm */
+.passcode-confirm-input {
+    margin-top: 4px;
+}
+
+/* ------------------------------
+   RECOVERY DIGITS (0–9)
+------------------------------- */
+
+.recovery-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 14px;
+}
+
+.recovery-digit {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: 1px solid #444;
+    background: #111;
+    color: #f5f5f5;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease,
+                color 0.2s ease;
+}
+
+.recovery-digit:hover {
+    background: #1c1c1c;
+    transform: translateY(-1px);
+}
+
+.recovery-digit.selected {
+    background: #ff7a00;
+    border-color: #ff7a00;
+    color: #fff;
+}
+
+
+body.theme-light-mode .recovery-digit {
+    background: #f3f3f3;
+    border-color: #bbbbbb;
+    color: #111111;
+}
+
+body.theme-light-mode .recovery-digit:hover {
+    background: #e6e6e6;
+}
+
+body.theme-light-mode .recovery-digit.selected {
+    background: #ff7a00;   /* vivid blue for light bg */
+    border-color: #ff7a00;
+    color: #ffffff;
+}
+
+
+/* ------------------------------
+   LOGIN PASSCODE CARD (non-first_boot)
+------------------------------- */
+
+.passcode-card {
+    margin-top: 24px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: #141414;
+    border-radius: 14px;
+    padding: 20px 22px 22px;
+    min-width: 260px;
+    max-width: 320px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+}
+
+.passcode-title {
+    margin: 0 0 6px;
+    font-size: 1.2rem;
+}
+
+.passcode-subtitle {
+    margin: 0 0 14px;
+    font-size: 0.85rem;
+    color: #cccccc;
+}
+
+.passcode-error {
+    min-height: 18px;
+    font-size: 0.8rem;
+    color: #ff4c4c;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.passcode-button {
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: #ff7a00;
+    color: white;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.passcode-button:hover {
+    background: #ff9a33;
+    transform: translateY(-1px);
+}
+
+
+/* Default (dark) is basically your current styling */
+body.theme-dark-mode {
+    background: #000;
+    color: #fff;
+}
+
+/* Light mode base */
+body.theme-light-mode {
+    background: #f5f5f5;
+    color: #000;
+}
+
+/* Cards in light mode */
+body.theme-light-mode .wizard-card,
+body.theme-light-mode .passcode-card,
+body.theme-light-mode .language-card {
+    background: #ffffff;
+    border-color: rgba(0,0,0,0.06);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.15);
+}
+
+/* Text inputs in light mode */
+body.theme-light-mode .text-input,
+body.theme-light-mode .passcode-input {
+    background: #ffffff;
+    color: #000;
+    border-color: #cccccc;
+}
+
+body.theme-light-mode .text-input::placeholder,
+body.theme-light-mode .passcode-input::placeholder {
+    color: #999999;
+}
+
+/* Unit buttons in light mode (unselected state) */
+body.theme-light-mode .unit-option {
+    background: #ffffff;
+    border-color: #cccccc;
+    color: #000;
+}
+
+/* Theme option cards (so the previews sit on light surfaces) */
+body.theme-light-mode .theme-option {
+    background: #ffffff;
+    border-color: #cccccc;
+}
+
+/* Language list items in light mode */
+body.theme-light-mode .language-option {
+    color: #111111;
+}
+
+/* Recovery digits in light mode */
+body.theme-light-mode .recovery-digit {
+    background: #ffffff;
+    color: #000;
+    border-color: #cccccc;
+}
+
+/* Wizard + login subtitles should darken in light mode */
+body.theme-light-mode .wizard-subtitle,
+body.theme-light-mode .passcode-subtitle {
+    color: #333 !important;
+}
+
+/* Errors also need stronger contrast on light mode */
+body.theme-light-mode .wizard-error,
+body.theme-light-mode .passcode-error {
+    color: #cc0000 !important;
+}
+
+/* Language selector subtitles */
+body.theme-light-mode .wizard-title,
+body.theme-light-mode .wizard-main-title {
+    color: #000 !important;
+}
+
+/* 👇 Light-mode tweak for back button */
+body.theme-light-mode .wizard-back-btn {
+    color: #000;
+    border-color: #999;
+}
+
+body.theme-light-mode .wizard-back-btn:hover {
+    background: #eaeaea;
+    border-color: #666;
+}
+
+/* ------------------------------
+   SAVING / PROGRESS CARD
+------------------------------- */
+
+.saving-card {
+    text-align: center;
+}
+
+.saving-spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.18);
+    border-top-color: #ff7a00;
+    margin: 6px auto 16px;
+    animation: orbitSavingSpin 0.9s linear infinite;
+}
+
+@keyframes orbitSavingSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Light theme tweak so spinner remains visible */
+body.theme-light-mode .saving-spinner {
+    border-color: rgba(0,0,0,0.15);
+    border-top-color: #ff7a00;
+}
+
