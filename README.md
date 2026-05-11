@@ -1,14 +1,14 @@
 
 # ORBIT
 
-ORBIT is an ESP32 embedded platform and dashboard system built using ESP-IDF.  
-It is designed as a lightweight embedded UI/portal framework featuring:
-
 ###### THIS WAS A SEMI COPY OF 'ZAIRE SYSTEM' ANOTHER PROJECT I WORKED ON(MUCH MORE ADVANCED AND BETTER IN MY OPINION). 
 ###### I COPIED THIS SEVERAL FILES AS A STARTING POINT FOR THE STRUCTURE AND FUNCTIONS OF THIS PROJECT, 
 ###### AND THEN MODIFIED IT FOR THE ORBIT SYSTEM. 
 ###### THERE MAY BE SOME UNUSED OR OUTDATED CODE IN THESE FILES, 
 ###### BUT I LEFT IT IN FOR NOW AS A REFERENCE FOR ANY FUTURE SETTINGS I MAY WANT TO ADD.
+
+ORBIT is an ESP32 embedded platform and dashboard system built using ESP-IDF.  
+It is designed as a lightweight embedded UI/portal framework featuring:
 
 - Captive portal setup
 - Embedded dashboard UI
@@ -28,6 +28,7 @@ It is designed as a lightweight embedded UI/portal framework featuring:
 - ESP-IDF v5.3.x recommended
 - ESP32
 - SPI LCD Display (ILI9341 currently supported)
+- DS3231 AT24C32 IIC RTC
 - Touch controller support
 
 ---
