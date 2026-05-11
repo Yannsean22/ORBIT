@@ -39,7 +39,7 @@ ORBIT is currently designed around the popular:
 - Cheap Yellow Display (CYD)
 - Cheap Yellow Chinese Display variants
 - ESP32 + ILI9341 touchscreen boards
-<img src="images/YELLO_LCD.png" width="400">
+<img src="images/Yellow_LCD.png" width="400">
 
 These displays are widely available online and commonly include:
 - ILI9341 LCD
