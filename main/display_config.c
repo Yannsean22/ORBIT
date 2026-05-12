@@ -127,6 +127,7 @@ void _display_clear(uint16_t color)
     }
 }
 
+
 //=========== Touch Read ===========
 #define TOUCH_X_MIN   389
 #define TOUCH_X_MAX   3721
@@ -163,6 +164,32 @@ static bool _display_touch_read(int *out_x, int *out_y)
     return true;
 }
 
+
+//=========== DISPLAY TIME AND DATE HELPER ===========
+static char *_date_get(char *buf, size_t len){
+
+    time_t now;
+    struct tm timeinfo;
+
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    strftime(buf, len, "%Y-%m-%d", &timeinfo);
+
+    return buf;
+}
+
+static char *_time_get(char *buf, size_t len){
+
+    time_t now;
+    struct tm timeinfo;
+
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    strftime(buf, len, "%H:%M:%S", &timeinfo);
+
+    return buf;
+}
+
 //=============== DISPLAY MODULES ===============================
 
 //=========== Time Format ===========
@@ -171,14 +198,11 @@ static int _time_minute = 42;
 
 static void _time_get_string(char *buf, size_t len)
 {
-    if (g_system_prefs.units == 1) {
-        int hour12 = _time_hour % 12;
-        if (hour12 == 0) hour12 = 12;
-        const char *period = (_time_hour < 12) ? "AM" : "PM";
-        snprintf(buf, len, "%d:%02d %s", hour12, _time_minute, period);
-    } else {
-        snprintf(buf, len, "%02d:%02d", _time_hour, _time_minute);
-    }
+
+    char timebuf[16];
+    _time_get(timebuf, sizeof(timebuf));
+    snprintf(buf, len, "%s", timebuf);
+    vTaskDelay(pdMS_TO_TICKS(100)); //update time every second
 }
 
 //=========== Date Format ===========
@@ -547,8 +571,7 @@ static void _widget_clock(int x, int y)
 
 static void _widget_clock_update(int x, int y) //update just the clock text without redrawing the whole widget (to avoid flicker)
 {
-    if(update_time_flag == 1){
-        char time_str[12];
+    char time_str[12];
         _time_get_string(time_str, sizeof(time_str));
 
         int text_w  = strlen(time_str) * 6 * 3;
@@ -561,7 +584,6 @@ static void _widget_clock_update(int x, int y) //update just the clock text with
         // redraw clock
         _display_draw_text(time_str, start_x, y, UI_WHITE, UI_BG, 3);
         update_time_flag = 0; // reset flag until next update is needed
-    }
 }
 
 //=========== Widget: Date ===========
@@ -574,6 +596,19 @@ static void _widget_date(int x, int y)
     _display_draw_text(date_str, start_x, y, UI_WHITE, UI_BG, 1);
 }
 
+static void _widget_date_update(int x, int y) //update just the clock text without redrawing the whole widget (to avoid flicker)
+{
+    char date_str[32];
+    _date_get_string(date_str, sizeof(date_str));
+    int text_w  = strlen(date_str) * 6;
+    int start_x = x - text_w / 2;
+    int text_h  = 7;
+
+    _display_draw_rect(start_x, y, text_w + 4, text_h + 4, UI_BG);
+
+
+    _display_draw_text(date_str, start_x, y, UI_WHITE, UI_BG, 1);
+}
 
 //=========== Widget: Weather ===========
 static void _widget_weather(int x, int y)
@@ -733,19 +768,74 @@ static void _widget_packers(int x, int y)
 }
 
 //=========== Widget: Ferrari ===========
-static void _widget_ferrari(int x, int y)
+static void _widget_f1(int x, int y)
 {
-    _display_draw_text("FERRARI",   x, y, UI_RED, UI_BG, 1);
-    _display_draw_hline(x, y + 9, 50, UI_RED);
-    _display_draw_text("F1 2025",  x, y + 14, UI_WHITE,  UI_BG, 1);
-    _display_draw_text("2nd",      x, y + 26, UI_WARN,  UI_BG, 2);
-    _display_draw_text("Constructor", x, y + 44, UI_GRAY,   UI_BG, 1);
-    _display_draw_text("187 pts",   x, y + 54, UI_WHITE,   UI_BG, 1);
+    if(wifi_connected)f1_fetch(&g_f1_data);
+    orbit_f1_data_t *f1 = &g_f1_data;  // your global f1 data struct
 
-    _display_draw_text("LEC", x,      y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("P2",  x,      y + 80, UI_ACCENT, UI_BG, 1);
-    _display_draw_text("SAI", x + 30, y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("P4",  x + 30, y + 80, UI_ACCENT, UI_BG, 1);
+    // pick team based on pref
+    int show_ferrari = g_system_prefs.f1;  // 0=mclaren, 1=ferrari
+
+    // team color and name
+    const char *team_name  = show_ferrari ? "FERRARI" : "MCLAREN";
+    uint16_t    team_color = show_ferrari ? UI_RED    : UI_ACCENT;
+
+    // driver data
+    orbit_driver_t *d1 = show_ferrari ? &f1->ferrari.leclerc  : &f1->mclaren.norris;
+    orbit_driver_t *d2 = show_ferrari ? &f1->ferrari.hamilton : &f1->mclaren.piastri;
+
+    // check if we have data
+    int has_data = (d1->points > 0 || d2->points > 0);
+
+    // team header
+    _display_draw_text(team_name, x, y, team_color, UI_BG, 1);
+    _display_draw_hline(x, y + 9, 50, team_color);
+
+    if(!has_data){
+        // no data state
+        _display_draw_text("Constructor", x, y + 14, UI_GRAY,  UI_BG, 1);
+        _display_draw_text("no data",     x, y + 24, UI_WHITE, UI_BG, 1);
+        return;
+    }
+
+    // season label
+    _display_draw_text("F1 2026", x, y + 14, UI_WHITE, UI_BG, 1);
+
+    // constructor position — pick whichever driver has lower position number
+    int con_pos = (d1->position < d2->position) ? d1->position : d2->position;
+    char pos_str[8];
+    switch(con_pos){
+        case 1:  snprintf(pos_str, sizeof(pos_str), "1st"); break;
+        case 2:  snprintf(pos_str, sizeof(pos_str), "2nd"); break;
+        case 3:  snprintf(pos_str, sizeof(pos_str), "3rd"); break;
+        default: snprintf(pos_str, sizeof(pos_str), "%dth", con_pos); break;
+    }
+    _display_draw_text(pos_str, x, y + 26, UI_WARN, UI_BG, 2);
+
+    // constructor points
+    int total_pts = (int)(d1->points + d2->points);
+    char pts_str[16];
+    snprintf(pts_str, sizeof(pts_str), "%d pts", total_pts);
+    _display_draw_text("Constructor", x, y + 44, UI_GRAY,  UI_BG, 1);
+    _display_draw_text(pts_str,       x, y + 54, UI_WHITE, UI_BG, 1);
+
+    // drivers
+    char d1_pts[8];
+    char d2_pts[8];
+    char d1_pos[4];
+    char d2_pos[4];
+
+    snprintf(d1_pts, sizeof(d1_pts), "P%d", d1->position);
+    snprintf(d2_pts, sizeof(d2_pts), "P%d", d2->position);
+    snprintf(d1_pos, sizeof(d1_pos), "%s",
+             show_ferrari ? "LEC" : "NOR");
+    snprintf(d2_pos, sizeof(d2_pos), "%s",
+             show_ferrari ? "HAM" : "PIA");
+
+    _display_draw_text(d1_pos, x,      y + 70, UI_GRAY,   UI_BG, 1);
+    _display_draw_text(d1_pts, x,      y + 80, UI_ACCENT, UI_BG, 1);
+    _display_draw_text(d2_pos, x + 30, y + 70, UI_GRAY,   UI_BG, 1);
+    _display_draw_text(d2_pts, x + 30, y + 80, UI_ACCENT, UI_BG, 1);
 }
 
 //=========== Widget: News ===========
@@ -772,6 +862,23 @@ static void _widget_button(int x, int y, int w, int h, uint16_t color, const cha
     _display_draw_text(label, label_x, label_y, UI_WHITE, color, 2);
 }
 
+static void _widget_wifi_update(int x, int y) 
+{
+    if(wifi_connected == 1){
+        _display_draw_text("WIFI: ON ", x, y, UI_GREEN, UI_BG, 1);// add space after ON to overwrite previous text when toggling nice little trick
+    }else{
+        _display_draw_text("WIFI: OFF", x, y, UI_ORANGE, UI_BG, 1);
+    }
+}
+
+static void _widget_settings_update(int x, int y) 
+{
+    if(is_settings_portal_on == 1){
+        _display_draw_text("SETTINGS: ON ", x, y, UI_GREEN, UI_BG, 1);// add space after ON to overwrite previous text when toggling nice little trick
+    }else{
+        _display_draw_text("SETTINGS: OFF", x, y, UI_ORANGE, UI_BG, 1);
+    }
+}
 
 //================ POSTIONS ==============================
 // Each postion depends on users prefs
@@ -779,7 +886,6 @@ static void _widget_button(int x, int y, int w, int h, uint16_t color, const cha
 
 static void _display_pos_top_middle(){
     
-    _widget_clock(DISPLAY_POSITION_TOP_MIDDLE_X_LV0, DISPLAY_POSITION_TOP_MIDDLE_Y_LV0);
     _widget_date(DISPLAY_POSITION_TOP_MIDDLE_X_LV1, DISPLAY_POSITION_TOP_MIDDLE_Y_LV1);
     
 }
@@ -790,7 +896,7 @@ static void _display_pos_mid_left(int x, int y){
 }
 
 static void _display_pos_mid_center(int x, int y){
-        _widget_ferrari(x, y);
+        _widget_f1(x, y);
 }
 
 static void _display_pos_mid_right(int x, int y){
@@ -839,25 +945,86 @@ void _draw_page1_task(void *vpParam)
 {
     _display_clear(UI_BG);   // only once at startup
 
-    _display_pos_top_middle();
-    // draw static stuff once
+
+    // draw static stuff once 
     _display_draw_hline(0, 50, LCD_WIDTH, UI_WHITE);
-    _display_pos_mid_left(DISPLAY_POSITION_MIDDLE_LEFT_X, DISPLAY_POSITION_MIDDLE_LEFT_Y);
+    // _display_pos_mid_left(DISPLAY_POSITION_MIDDLE_LEFT_X, DISPLAY_POSITION_MIDDLE_LEFT_Y);
+    // _display_pos_mid_right(DISPLAY_POSITION_MIDDLE_RIGHT_X, DISPLAY_POSITION_MIDDLE_RIGHT_Y);
+
+    _display_pos_bottom_middle(); //button
+
+    vTaskDelay(pdMS_TO_TICKS(100)); // small delay to ensure above draws before updates start
     _display_pos_mid_center(DISPLAY_POSITION_MIDDLE_CENTER_X, DISPLAY_POSITION_MIDDLE_CENTER_Y);
-    _display_pos_mid_right(DISPLAY_POSITION_MIDDLE_RIGHT_X, DISPLAY_POSITION_MIDDLE_RIGHT_Y);
-    _display_pos_bottom_middle();
+
 
     while (1)
     {
 
-        // update only changing stuff
-        _widget_clock_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV0,
-                             DISPLAY_POSITION_TOP_MIDDLE_Y_LV0);
+        _widget_wifi_update(DISPLAY_POSITION_TOP_LEFT_X_LV0, DISPLAY_POSITION_TOP_LEFT_Y_LV0);
+        _widget_settings_update(DISPLAY_POSITION_TOP_LEFT_X_LV1, DISPLAY_POSITION_TOP_LEFT_Y_LV1);
+        _widget_clock_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV0, DISPLAY_POSITION_TOP_MIDDLE_Y_LV0);
+        _widget_date_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV1, DISPLAY_POSITION_TOP_MIDDLE_Y_LV1);
 
         _display_pos_single_point(DISPLAY_POSITION_SINGLE_POINT_X,
                                   DISPLAY_POSITION_SINGLE_POINT_Y);
 
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void _time_widget_task(void *vpParam){
+
+
+    while (1)
+    {
+
+        vTaskDelay(pdMS_TO_TICKS(500));// every seconds but offset to since we have stop in these calls
+    }
+
+}
+
+void _date_widget_task(void *vpParam){
+
+    while (1)
+    {
+        // _widget_date_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV1,
+        //                     DISPLAY_POSITION_TOP_MIDDLE_Y_LV1);
+
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60));// every minute
+    }
+
+}
+
+void _weather_widget_task(void *vpParam){
+
+    while (1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+    }
+
+}
+
+void _f1_widget_task(void *vpParam){
+
+    while (1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+    }
+
+}
+
+void _packers_widget_task(void *vpParam){
+    
+    while (1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+    }
+}
+
+void _fun_fact_timer_task(void *vpParam){
+    while (1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60));// every minutes
     }
 }
 
@@ -879,6 +1046,8 @@ void _display_main_UI(void)
                 if(is_settings_portal_on == 0){
                     if(_network_settings_mode() == ORBIT_OK)start_dns_server(); // start captive portal DNS server to redirect to settings page
                     is_settings_portal_on = 1; // set flag to indicate portal is active
+
+
                 }else{
                     stop_dns_server(); // stop DNS server when exiting settings
                     is_settings_portal_on = 0; // reset flag

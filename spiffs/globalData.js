@@ -26,8 +26,11 @@ const CODEX = Object.freeze({
   DEVICE_ID: 0xA2,
   HARDWARE_REV: 0xA3,
   BLUETOOTH_VERSION: 0xA4,
-  manufacturer: 0xB5,
-  model_name: 0xB6,
+  MANUFACTURER: 0xB5,
+  MODEL_NAME: 0xB6,
+
+  ADV_WIFIS: 0xC0, //used to send available wifi SSIDs to portal for display
+  CON_WIFI: 0xC1, //used to send selected wifi SSID and password for connection
 });
 
 //SYSTEM SETTINGS
@@ -40,15 +43,6 @@ var systemSettings = {//S
   theme: null,
   f1: null,
 
-  walkie_volume: null,
-  walkie_mic_sensitivity: null,
-  walkie_bt_behavior: null,
-
-  btAutoConnect: null,
-  bt_init_volume: null,
-  btAutoPlay: null,
-  btAutoDecline: null,
-  
   passcode: null,
   recovery_code: null,
 };
@@ -96,9 +90,12 @@ async function setSettingsRecoveryCode(val) {
   return await UpdateSettings(`&${CODEX.RECOVERY_CODE}&${val}&`);
 }
 
-
 async function setSettingsDeviceF1(val) {
   return await UpdateSettings(`&${CODEX.DEVICE_F1}&${val}&`);
+}
+
+async function setSettingsWiFi(vwifi, pwd) {
+  return await UpdateSettings(`&${CODEX.CON_WIFI}&${vwifi}&${pwd}&`);
 }
 
 //GET SETTINGS
@@ -328,9 +325,43 @@ async function LoadSettings(settingsData){
 
 }
 
-//<-------------- SYSTEM SETTINGS ------------->//
+//<-------------- SYSTEM GRAB WIFIs ------------->//
 
 
+let availableWiFiSSIDs = [];
+
+async function getWiFiSSIDs(){
+
+  try {
+    const response = await fetch('/settings_get_settings_data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',   // or 'text/plain' if you prefer
+      },
+      body: JSON.stringify(`&${CODEX.ADV_WIFIS}&1&`)      // Send your data here)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const responseText = await response.text();   // ESP32 should reply with text
+    
+    console.log("ESP32 replied:", responseText);
+
+    const wifiData = responseText.split(','); // Assuming the ESP32 sends a comma-separated list of SSIDs
+    availableWiFiSSIDs = wifiData.map(ssid => ssid.trim()); // Trim any whitespace
+
+    console.log("Available Wi-Fi SSIDs:", availableWiFiSSIDs);
+
+    return ORBIT_OK;
+
+  } catch (err) {
+    console.error("Failed to communicate with ESP32:", err);
+    throw err;   // rethrow if you want the caller to handle the error
+  }
+
+}
 
 //<-------------- GLOBAL LANGUAGE ------------->//
 // --------------------------------------------

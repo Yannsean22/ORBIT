@@ -109,6 +109,8 @@ static esp_err_t settings_set_settings_data_handler(httpd_req_t *req)
     //return 
     orbit_err_t change = 0;
 
+    vTaskDelay(pdMS_TO_TICKS(10)); //small delay never hurts in these situations, especially when dealing with async web requests and potential NVS writes
+
     // ===================== STEP 5: HANDLE SETTING =====================
     switch (key)
     {
@@ -136,6 +138,10 @@ static esp_err_t settings_set_settings_data_handler(httpd_req_t *req)
             change = settings_update_device_theme(value);
             break;
 
+        case DEVICE_F1_CODEX:
+            change = settings_update_device_f1(value);
+            break;
+
         case PASSCODE_CODEX:
             change = settings_update_passcode(value);
             break;
@@ -144,6 +150,21 @@ static esp_err_t settings_set_settings_data_handler(httpd_req_t *req)
             change = settings_update_recovery_code(value);
             break;
 
+        case CON_WIFI_CODEX:
+            orbit_err_t e = _network_connect_to_wifi(parts[2], parts[3]);
+
+            if(e == ORBIT_OK){
+                if(settings_update_wifi_security(parts[2], parts[3]) == ORBIT_OK){
+                    change = ORBIT_OK;
+                } else {
+                    change = ORBIT_ERR;
+                }
+                
+            } else {
+                change = ORBIT_ERR;
+            }
+
+            break;
 
         default:
             printf("Unknown codex: %u\n", key);
@@ -245,10 +266,64 @@ static esp_err_t settings_get_settings_data_handler(httpd_req_t *req) // Handle 
             snprintf(value, sizeof(value), "%d",settings_get_device_theme());
             break;
 
+        case DEVICE_F1_CODEX:
+            snprintf(value, sizeof(value), "%d",settings_get_device_f1());
+            break;
+         
         case PASSCODE_CODEX:
         
             snprintf(value, sizeof(value), "%s",(settings_check_passcode(pass) == ORBIT_OK ? "ORBIT_OK" : "ORBIT_ERR")); //never send passcode back to UI
            
+            break;
+
+        case ADV_WIFIS_CODEX:
+
+            printf("Fetching available WiFi SSIDs...\n");
+            orbit_err_t e = _network_connect_mode();
+            if(e == ORBIT_ERR)return ESP_FAIL;
+
+            vTaskDelay(pdMS_TO_TICKS(2000)); //wait for wifi scan to populate availableNetworks
+
+            wifi_scan_config_t scan_cfg = {
+                .ssid = NULL,
+                .bssid = NULL,
+                .channel = 0,
+                .show_hidden = true
+            };
+
+            while(1){
+                ESP_ERROR_CHECK(esp_wifi_scan_start(&scan_cfg, true)); // true = blocking
+
+                uint16_t ap_count = 0;
+                esp_wifi_scan_get_ap_num(&ap_count);
+
+                wifi_ap_record_t ap_list[ap_count];
+                esp_wifi_scan_get_ap_records(&ap_count, ap_list);
+
+                uint8_t first_index = 1; //used to avoid leading comma in string
+
+                for(int i = 0; i < ap_count; i++){
+                   
+                    if(strcmp((char*)ap_list[i].ssid, "") != 0){ // Filter out empty SSIDs
+                        if(first_index == 0)strcat(availableNetworks, ",");
+                        strcat(availableNetworks, (char*)ap_list[i].ssid);
+                        first_index = 0;
+                    }
+                 
+                }
+
+                break;
+            }
+
+            printf("Available Networks: %s\n", availableNetworks); // Debug print
+
+            httpd_resp_set_type(req, "text/plain");
+            httpd_resp_send(req, availableNetworks, strlen(availableNetworks));
+            vTaskDelay(pdMS_TO_TICKS(200)); //small delay to ensure response is sent before next scan starts
+            
+            memset(availableNetworks, 0, sizeof(availableNetworks)); // Clear buffer for next scan results
+            return ESP_OK; //prevent unwanted calls
+
             break;
 
         default:

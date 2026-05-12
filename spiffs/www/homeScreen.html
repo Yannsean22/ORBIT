@@ -39,42 +39,38 @@
     <!-- I COULD HAVE HAD THE USER CHOOSE SOME NETWORK BUT THIS WAS A GIFT SO I DID NOT WANT TO GO TOO IN DEPTH AND HAD OTHER THINGS GOING ON -->
       <div class="wifi-connect-card">
 
-      <div class="wifi-connect-header">
-        <div class="wifi-connect-title">Wi-Fi Setup</div>
-        <div class="wifi-connect-subtitle">
-          Connect your device to a wireless network
-        </div>
+          <div class="wifi-connect-header">
+            <div class="wifi-connect-title">Wi-Fi Setup</div>
+            <div class="wifi-connect-subtitle">
+              Connect your device to a wireless network
+            </div>
+          </div>
+
+          <select id="dashboard-device-wifi" class="settings-select" disabled>
+        </select>
+
+        <input
+          disabled
+          type="password"
+          class="wifi-input"
+          id="dashboard-device-pass"
+          value=""
+          placeholder="ENTER YOUR WIFI PASSWORD"
+        />
+
+        <button class="wifi-btn" id="wifi-btn" disabled>
+          Connect To Wi-Fi
+        </button>
+
       </div>
 
-      <input
-        type="text"
-        class="wifi-input"
-        id="dashboard-device-name"
-        value=""
-        placeholder="ENTER YOUR WIFI ID"
-      />
-
-      <input
-        type="password"
-        class="wifi-input"
-        id="dashboard-device-pass"
-        value=""
-        placeholder="ENTER YOUR WIFI PASSWORD"
-      />
-
-      <button class="wifi-btn">
-        FIND NETWORK
+    <div class="leave-portal-wrap">
+      <button id="leave-portal-btn" class="leave-portal-btn">
+        Leave Portal
       </button>
-
     </div>
 
-      <div class="leave-portal-wrap">
-        <button id="leave-portal-btn" class="leave-portal-btn">
-          Leave Portal
-        </button>
-      </div>
-
-    </main>
+  </main>
 
     <!-- SETTINGS VIEW -->
     <section class="settings-view hidden" id="settings-view">
@@ -254,12 +250,12 @@
 
       <div class="settings-row">
         <span class="settings-label">Manufacturer</span>
-        <span class="settings-label" id="manufacturer-label">zaire systems</span>
+        <span class="settings-label" id="manufacturer-label">WHO KNOWS</span>
       </div>
 
       <div class="settings-row">
         <span class="settings-label">Model Name</span>
-        <span class="settings-label" id="model-name-label">snowman</span>
+        <span class="settings-label" id="model-name-label">IDK WHY THIS IS HERE</span>
       </div>
 
       <div class="settings-row">
@@ -269,12 +265,12 @@
 
       <div class="settings-row">
         <span class="settings-label">Build Date</span>
-        <span class="settings-label" id="build-date">2026-04-30</span>
+        <span class="settings-label" id="build-date">2026-05-10</span>
       </div>
 
       <div class="settings-row">
         <span class="settings-label">Device ID</span>
-        <span class="settings-label" id="device-id">ZAIRE-XXXXXX</span>
+        <span class="settings-label" id="device-id">ORBIT-051026001</span>
       </div>
 
       <div class="settings-row">
@@ -284,7 +280,7 @@
 
       <div class="settings-row">
         <span class="settings-label">Bluetooth Version</span>
-        <span class="settings-label" id="bluetooth-version">V5.1</span>
+        <span class="settings-label" id="bluetooth-version">V4.2</span>
       </div>
 
     </section>

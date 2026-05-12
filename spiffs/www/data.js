@@ -15,6 +15,9 @@ function showView(viewId, navBtn) {
 
 async function renderDashboard() {
 
+  const wifiSelect = document.getElementById("dashboard-device-wifi");
+  const wifiPass = document.getElementById("dashboard-device-pass");
+  const wifiConnectBtn = document.getElementById("wifi-btn");
   // do not touch
   var resp;
   resp = await getSettingsUserName();
@@ -36,15 +39,39 @@ async function renderDashboard() {
   systemSettings.theme = resp;
   // end do not touch
 
-  document.getElementById("bt-state").textContent =
-    systemSettings.btConnected ? "Connected" : "Disconnected";
-  document.getElementById("bt-device-name").textContent = systemSettings.btDeviceName;
-  document.getElementById("bt-autoconnect").textContent =
-    systemSettings.btAutoConnect ? "ON" : "OFF";
+  resp = await getWiFiSSIDs();
+  if (resp === ORBIT_OK) {
+    wifiSelect.disabled = false;
+    wifiPass.disabled = false;
+    wifiConnectBtn.disabled = false;
+     availableWiFiSSIDs.forEach(ssid => {
+      const option = document.createElement("option");
+      option.style.color = "black";
+      option.value = ssid;
+      option.textContent = ssid;
+      wifiSelect.appendChild(option);
+    });
+  
+
+  wifiConnectBtn.onclick = () => {
+    const selectedSSID = wifiSelect.value;
+    const password = wifiPass.value.trim();
+    
+    showConfirm({
+          icon: "📶",
+          title: "Wi-Fi settings sent!",
+          subtitle: `The device will now attempt to connect to "${selectedSSID}". If the connection is successful, you will see updated network information on the dashboard.`,
+          onConfirm: () => {
+            setSettingsWiFi(selectedSSID, password);
+          }
+        });
+
+  }
+
 
   document.getElementById("settings-name-input").value = systemSettings.user_name;
   document.getElementById("settings-device-name-input").value = systemSettings.device_name;
-}
+}}
 
 // ---------- LEAVE PORTAL ----------
 document.getElementById("leave-portal-btn").onclick = () => {
@@ -114,6 +141,8 @@ async function initSettings() {
   const resetFactoryBtn = document.getElementById("settings-factory-reset-btn");
   const saveBtn = document.getElementById("settings-save-btn");
 
+  const manufacturerText = document.getElementById("manufacturer-label");
+
   var resp;
   resp = await getSettingsUserName();
   systemSettings.user_name = resp;
@@ -132,6 +161,11 @@ async function initSettings() {
 
   resp = await getSettingsDeviceF1();
   systemSettings.f1 = resp;
+
+  manufacturerText.innerText = systemInfo.manufacturer;
+
+  
+  console.log("Loaded settings:", systemSettings);
 
   nameInput.value = systemSettings.user_name || "RIDER";
   deviceNameInput.value = systemSettings.device_name || "ZAIRE";

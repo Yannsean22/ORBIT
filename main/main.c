@@ -13,7 +13,7 @@
 #include "globalVar.h"
 
 
-
+orbit_f1_data_t g_f1_data = {0};
 
 void app_main(void)
 {
@@ -32,13 +32,18 @@ void app_main(void)
 
 
     xTaskCreate(_draw_page1_task, "_draw_page1_task",  10240, NULL, 7, NULL);
-    xTaskCreate(_clock_timer_task, "_clock_timer_task",  2048, NULL, 4, NULL);
-    xTaskCreate(_fun_fact_timer_task, "_fun_fact_timer_task",  2048, NULL, 4, NULL);
-    xTaskCreate(_full_recycle_timer_task, "_full_recycle_timer_task",  2048, NULL, 4, NULL);
+    xTaskCreate(_time_widget_task, "_time_widget_task", 4096, NULL, 7, NULL);
+    xTaskCreate(_date_widget_task, "_date_widget_task", 4096, NULL, 7, NULL);
+    xTaskCreate(_weather_widget_task, "_weather_widget_task", 4096, NULL, 7, NULL);
+    xTaskCreate(_f1_widget_task, "_f1_widget_task", 4096, NULL, 7, NULL);
+    xTaskCreate(_packers_widget_task, "_packers_widget_task", 4096, NULL, 7, NULL);
+    xTaskCreate(_fun_fact_timer_task, "_fun_fact_timer_task", 4096, NULL, 7, NULL);
 
 
-    _display_main_UI();
+    // orbit_f1_data_t f1;
+    // f1_fetch(&f1);
     
+    _display_main_UI();
 
 }
 

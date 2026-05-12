@@ -529,6 +529,7 @@ body {
   font-size: 0.82rem;
   font-family: inherit;
   outline: none;
+  align-items: center;
 }
 
 .settings-select:disabled {
@@ -684,6 +685,10 @@ body {
   flex-direction: column;
   gap: 14px;
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+  grid-column: span 2;
+  justify-self: center;
+  width: 100%;
+  max-width: 320px;
 }
 
 .wifi-connect-header {

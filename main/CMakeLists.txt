@@ -1,6 +1,8 @@
 idf_component_register(SRCS 
 
 
+                "f1_config.c"
+                "orbit_date_time_config.c"
                 "task_config.c"
                 "display_config.c"
                 "portal_config.c"

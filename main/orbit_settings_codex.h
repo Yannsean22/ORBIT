@@ -27,4 +27,8 @@
 #define MANUFACTURER_CODEX                          0xB5
 #define MODEL_NAME_CODEX                            0xB6
 
+
+#define ADV_WIFIS_CODEX                            0xC0 //used to send available wifi SSIDs to portal for display
+#define CON_WIFI_CODEX                             0xC1 //used to send selected wifi SSID and password for connection
+
 #endif // ZAIRE_SYSTEMS_PORTAL_SETTINGS_CODEX_H

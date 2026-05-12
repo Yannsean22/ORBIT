@@ -341,3 +341,22 @@ orbit_err_t settings_update_recovery_code(const char *recovery_code){
 
     return ORBIT_OK;
 }
+
+
+orbit_err_t settings_update_wifi_security(const char *wifi_ssid, const char *wifi_pass){
+
+    strncpy(g_sys_secure_info.wifi_ssid, wifi_ssid, sizeof(g_sys_secure_info.wifi_ssid) - 1);
+    g_sys_secure_info.wifi_ssid[sizeof(g_sys_secure_info.wifi_ssid) - 1] = '\0';
+
+    strncpy(g_sys_secure_info.wifi_pass, wifi_pass, sizeof(g_sys_secure_info.wifi_pass) - 1);
+    g_sys_secure_info.wifi_pass[sizeof(g_sys_secure_info.wifi_pass) - 1] = '\0';
+
+    g_sys_secure_info.wifi_enabled = true; // Assuming WiFi is enabled when credentials are updated
+
+    if (nvs_write_blob(sys_handle,
+        NVS_KEY_SYSTEM_SECURE,
+        &g_sys_secure_info,
+        sizeof(g_sys_secure_info)) != ORBIT_OK) return ORBIT_ERR;
+
+    return ORBIT_OK;
+}

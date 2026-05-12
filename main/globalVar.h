@@ -25,6 +25,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 
+#include <esp_log.h>
 #include <esp_flash.h>
 #include <esp_wifi.h>
 #include <esp_netif.h>
@@ -40,6 +41,7 @@
 #include <esp_http_server.h>
 #include <esp_netif_ip_addr.h>
 #include <esp_system.h>
+#include <esp_http_client.h>
 
 #include <lwip/sockets.h>
 #include <lwip/inet.h>
@@ -56,8 +58,11 @@
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_ili9341.h"
 
-#include "orbit_config.h"
+#include "esp_sntp.h"
+#include "time.h"
 
+#include "orbit_config.h"
+#include "cJSON.h"
 
 //BUZZER
 #define BUZZER_PIN          GPIO_NUM_26
@@ -76,8 +81,11 @@ extern bool update_time_flag; // if true, clock will update time then turn off r
 extern bool update_fun_fact_flag; // if true, fun fact will update then turn off runs every 3 minute
 extern bool update_full_recycle_flag; // if true, full recycle will update then turn off runs every hour
 void _draw_page1_task(void *vpParam);
-void _clock_timer_task(void *vpParam);
+void _time_widget_task(void *vpParam);
+void _date_widget_task(void *vpParam);
+void _weather_widget_task(void *vpParam);
+void _f1_widget_task(void *vpParam);
+void _packers_widget_task(void *vpParam);
 void _fun_fact_timer_task(void *vpParam);
-void _full_recycle_timer_task(void *vpParam);
 
 #endif

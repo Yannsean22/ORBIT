@@ -65,6 +65,7 @@ typedef struct {
     uint8_t first_boot;              // 0 = new device, 1 = already accepted
     char wifi_ssid[64];              // Last connected WiFi SSID
     char wifi_pass[64];              // Last connected WiFi password (encrypted in real implementation
+    bool wifi_enabled;              // Is WiFi enabled or disabled
 } sys_secure_info_t;
 
 // ======================
@@ -180,6 +181,9 @@ orbit_err_t settings_update_device_theme(const char *device_theme);
 orbit_err_t settings_update_device_f1(const char *device_f1);
 orbit_err_t settings_update_passcode(const char *passcode);
 orbit_err_t settings_update_recovery_code(const char *recovery_code);
+orbit_err_t settings_update_wifi_security(const char *wifi_ssid, const char *wifi_pass);
+
+
 
 orbit_err_t settings_get_first_boot(void);
 const char *settings_get_user_name(void);
@@ -197,22 +201,28 @@ const char *settings_get_device_id(void);
 const char *settings_get_hardware_rev(void);
 
 orbit_err_t settings_check_passcode(const char *input_passcode);
+orbit_err_t settings_get_wifi_security();
+
 
 //NETWORK
 #define NETWORK_MAX_CONN            9
 #define NETWORK_SETTINGS_SSID       "ORBIT VIEW PORTAL"
+extern char availableNetworks[5120];
+extern bool wifi_connected;
 orbit_err_t _network_init(void);
 orbit_err_t _network_settings_mode();
-
-
+orbit_err_t _network_connect_mode();
+orbit_err_t _network_connect_to_wifi(const char* ssid, const char* password);
 
 
 
 //=============== DISPLAY ====================
 
 //DISLAY POSITIONS
-#define DISPLAY_POSITION_TOP_LEFT_X
-#define DISPLAY_POSITION_TOP_LEFT_Y
+#define DISPLAY_POSITION_TOP_LEFT_X_LV0                     LCD_WIDTH / 1.25
+#define DISPLAY_POSITION_TOP_LEFT_X_LV1                     LCD_WIDTH / 1.35
+#define DISPLAY_POSITION_TOP_LEFT_Y_LV0                     8
+#define DISPLAY_POSITION_TOP_LEFT_Y_LV1                     24
 #define DISPLAY_POSITION_TOP_MIDDLE_X_LV0                   LCD_WIDTH / 2
 #define DISPLAY_POSITION_TOP_MIDDLE_Y_LV0                   8
 #define DISPLAY_POSITION_TOP_MIDDLE_X_LV1                   LCD_WIDTH / 2
@@ -275,4 +285,37 @@ orbit_err_t _display_init(void);
 void _display_clear(uint16_t color);
 void _display_hello_world(void);
 void _display_main_UI(void);
+
+
+//=============== F1 ===================
+#define OPENF1_URL "https://api.openf1.org/v1/championship_drivers?session_key=latest&driver_number=4&driver_number=81&driver_number=16&driver_number=44"
+
+typedef struct {
+    int   driver_number;
+    char  name[16];
+    int   position;
+    float points;
+} orbit_driver_t;
+
+typedef struct {
+    orbit_driver_t norris;    // #4
+    orbit_driver_t piastri;   // #81
+} orbit_mclaren_t;
+
+typedef struct {
+    orbit_driver_t leclerc;   // #16
+    orbit_driver_t hamilton;  // #44
+} orbit_ferrari_t;
+
+typedef struct {
+    orbit_mclaren_t mclaren;
+    orbit_ferrari_t ferrari;
+} orbit_f1_data_t;
+
+extern orbit_f1_data_t g_f1_data;
+
+void f1_print(orbit_f1_data_t *data); //for testing
+orbit_err_t f1_fetch(orbit_f1_data_t *out);
+orbit_err_t f1_parse_drivers(const char *json, orbit_f1_data_t *out);
+orbit_err_t f1_parse_constructors(const char *json, orbit_f1_data_t *out);
 #endif

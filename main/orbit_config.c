@@ -61,7 +61,7 @@ static orbit_err_t _default_settings_bootstrap(void){
     if(settings_update_passcode("123456") != ORBIT_OK)return ORBIT_ERR;
     if(settings_update_recovery_code("0") != ORBIT_OK)return ORBIT_ERR;
 
-    strlcpy(g_device_info.manufacturer, "YANN'S BEDROOM", sizeof(g_device_info.manufacturer));
+    strlcpy(g_device_info.manufacturer, "lol's BEDROOM", sizeof(g_device_info.manufacturer));
     strlcpy(g_device_info.model_name, "IDK Y THIS IS HERE", sizeof(g_device_info.model_name));
     strlcpy(g_device_info.firmware_version, "1.0.0", sizeof("1.0.0"));
     strlcpy(g_device_info.build_date, "2026-5-4", sizeof("2026-5-4"));
@@ -93,13 +93,6 @@ static orbit_err_t _nvs_load_settings(void){
         NVS_KEY_SYSTEM_SECURE,
         &g_sys_secure_info,
         sizeof(g_sys_secure_info)) != ORBIT_OK) return ORBIT_ERR;
-
-
-    // not this yet since it contains the passcode, but will need to load this too eventually
-    // if (nvs_read_blob(sys_handle,
-    //     NVS_KEY_USER_SECURE,
-    //     &g_usr_secure_info,
-    //     sizeof(g_usr_secure_info)) != ORBIT_OK) return ORBIT_ERR;
 
     return ORBIT_OK;
 }
@@ -137,8 +130,11 @@ orbit_err_t orbit_config_init(void){
     if(_nvs_load_settings() != ORBIT_OK)return ORBIT_ERR;
     if(_spiffs_init() != ORBIT_OK)return ORBIT_ERR;
     if(_network_init() != ORBIT_OK)return ORBIT_ERR;
+    vTaskDelay(pdMS_TO_TICKS(500)); // prevent display issues
+    if(g_sys_secure_info.wifi_enabled)_network_connect_to_wifi(g_sys_secure_info.wifi_ssid, g_sys_secure_info.wifi_pass);// do no care if it fails, user can fix in settings, plus what if the network is off? lol
+    vTaskDelay(pdMS_TO_TICKS(500));//prevent display issues
     if(_display_init() != ORBIT_OK)return ORBIT_ERR;
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(500));//prevent display issues
     _display_clear(UI_BG);
     return ORBIT_OK;
 }
