@@ -155,9 +155,14 @@ idf.py flash monitor
 
 ---
 
-# STATUS
+# PIC EXAMPLES
+<img src="images/IMG_5117.JPG" width="200">
+<img src="images/IMG_5119.JPG" width="200">
+<img src="images/IMG_5120.JPG" width="200">
+<img src="images/IMG_5121.JPG" width="200">
+<img src="images/IMG_5118.JPG" width="200">
 
-ORBIT is currently in active development.
+
 
 Some systems are experimental and subject to change.
 
