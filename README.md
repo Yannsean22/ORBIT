@@ -159,7 +159,7 @@ idf.py flash monitor
 <img src="images/IMG_5117.JPG" width="200">
 <img src="images/IMG_5119.PNG" width="200">
 <img src="images/IMG_5120.PNG" width="200">
-<img src="images/IMG_5121.PGN" width="200">
+<img src="images/IMG_5121.PNG" width="200">
 <img src="images/IMG_5118.JPG" width="200">
 
 
