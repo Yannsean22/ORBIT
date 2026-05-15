@@ -121,6 +121,26 @@ orbit_err_t orbit_config_init(void);
 orbit_err_t _spiffs_init(void);
 
 
+//======================
+// I2C PINS
+//======================
+#define I2C_NUM         I2C_NUM_0
+#define I2C_SDA_PIN     GPIO_NUM_22
+#define I2C_SCL_PIN     GPIO_NUM_21
+orbit_err_t _ds3231_init(void);
+char* _ds3231_get_time(void);
+char* _ds3231_get_date(void);
+orbit_err_t _ds3231_set_time(uint8_t hours, uint8_t minutes, uint8_t seconds);
+orbit_err_t _ds3231_set_date(uint8_t day, uint8_t month, uint8_t year);
+orbit_err_t ds3231_test_write_seconds(void);
+
+//======================
+// RBG LIGHT PINS
+//======================
+#define RED_LED_PIN     GPIO_NUM_4
+#define GREEN_LED_PIN   GPIO_NUM_16
+#define BLUE_LED_PIN    GPIO_NUM_17
+
 
 //DNS SERVER - CAPTIVE PORTAL 
 extern char dns_server_ssid[128];
@@ -316,6 +336,52 @@ extern orbit_f1_data_t g_f1_data;
 
 void f1_print(orbit_f1_data_t *data); //for testing
 orbit_err_t f1_fetch(orbit_f1_data_t *out);
-orbit_err_t f1_parse_drivers(const char *json, orbit_f1_data_t *out);
-orbit_err_t f1_parse_constructors(const char *json, orbit_f1_data_t *out);
+
+
+
+//========= WEATHER ==================
+#define WEATHER_URL "https://api.open-meteo.com/v1/forecast?latitude=43.0117&longitude=-88.2315&current=temperature_2m,apparent_temperature,weather_code&daily=temperature_2m_max&timezone=auto"
+typedef struct {
+    char day[4];      // MON, TUE, WED
+    int temp_max;
+} orbit_weather_day_t;
+
+typedef struct {
+    char city[32];
+
+    int temp_c;
+    int feels_c;
+    int weather_code;
+
+    char condition[24];
+
+    orbit_weather_day_t forecast[3];
+
+    int valid;
+} orbit_weather_data_t;
+
+extern orbit_weather_data_t g_weather_data;
+orbit_err_t weather_fetch(orbit_weather_data_t *out);
+
+
+//========= PACKERS ===================
+#define PACKERS_URL \
+"https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/9/events?lang=en&region=us"
+
+
+typedef struct {
+    char opponent[16];
+    char date[16];
+    char status[16];
+
+    int packers_score;
+    int opponent_score;
+
+    int is_final;
+    int valid;
+} orbit_packers_data_t;
+
+extern orbit_packers_data_t g_packers_data;
+orbit_err_t packers_fetch(orbit_packers_data_t *out);
+
 #endif

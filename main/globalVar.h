@@ -48,7 +48,6 @@
 
 #include <driver/gpio.h>
 #include <driver/i2c.h>
-#include <driver/i2s.h>
 #include <driver/uart.h>
 #include <driver/spi_master.h>
 #include <driver/ledc.h>
@@ -80,6 +79,9 @@ void error_beep(void);
 extern bool update_time_flag; // if true, clock will update time then turn off runs every second
 extern bool update_fun_fact_flag; // if true, fun fact will update then turn off runs every 3 minute
 extern bool update_full_recycle_flag; // if true, full recycle will update then turn off runs every hour
+extern bool update_weather_flag; // if true, weather will update then turn off runs every 5 minutes
+extern bool update_f1_flag; // if true, F1 will update then turn off runs every 5 minutes
+extern bool update_packers_flag; // if true, packers will update then turn off runs every 5 minutes
 void _draw_page1_task(void *vpParam);
 void _time_widget_task(void *vpParam);
 void _date_widget_task(void *vpParam);
@@ -87,5 +89,6 @@ void _weather_widget_task(void *vpParam);
 void _f1_widget_task(void *vpParam);
 void _packers_widget_task(void *vpParam);
 void _fun_fact_timer_task(void *vpParam);
+void _rst_whole_sys_task(void *vpParam);
 
 #endif

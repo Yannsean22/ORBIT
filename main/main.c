@@ -30,19 +30,16 @@ void app_main(void)
 
     if(orbit_config_init() != ORBIT_OK){printf("INIT Failed!\n");vTaskDelay(4000 / portTICK_PERIOD_MS);esp_restart();}
 
-
     xTaskCreate(_draw_page1_task, "_draw_page1_task",  10240, NULL, 7, NULL);
-    xTaskCreate(_time_widget_task, "_time_widget_task", 4096, NULL, 7, NULL);
-    xTaskCreate(_date_widget_task, "_date_widget_task", 4096, NULL, 7, NULL);
-    xTaskCreate(_weather_widget_task, "_weather_widget_task", 4096, NULL, 7, NULL);
-    xTaskCreate(_f1_widget_task, "_f1_widget_task", 4096, NULL, 7, NULL);
-    xTaskCreate(_packers_widget_task, "_packers_widget_task", 4096, NULL, 7, NULL);
-    xTaskCreate(_fun_fact_timer_task, "_fun_fact_timer_task", 4096, NULL, 7, NULL);
-
-
-    // orbit_f1_data_t f1;
-    // f1_fetch(&f1);
+    xTaskCreate(_weather_widget_task, "_weather_widget_task", 2048, NULL, 3, NULL);
+    xTaskCreate(_f1_widget_task, "_f1_widget_task", 2048, NULL, 3, NULL);
+    xTaskCreate(_packers_widget_task, "_packers_widget_task", 2048, NULL, 3, NULL);
+    xTaskCreate(_fun_fact_timer_task, "_fun_fact_timer_task", 2048, NULL, 3, NULL);
+    xTaskCreate(_rst_whole_sys_task, "_rst_whole_sys_task", 1024, NULL, 10, NULL);
     
+
+    printf("f1: %d\n", g_system_prefs.f1); // for debugging, shows that f1 data is being fetched and stored correctly
+
     _display_main_UI();
 
 }

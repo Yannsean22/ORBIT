@@ -412,9 +412,9 @@ unitOptions.forEach((btn) => {
     btn.classList.add("selected");
     unitsError.textContent = "";
 
-    const units = btn.dataset.units || "metric";
-    systemSettings.units = units;
-    units === "metric"? systemSettings.units = 0: systemSettings.units = 1;
+    const units = btn.value || "1";
+    systemSettings.f1 = units;
+    units === "0"? systemSettings.f1 = 0: systemSettings.f1 = 1;
 
 
     if (unitsContinueBtn) {

@@ -13,6 +13,60 @@ function showView(viewId, navBtn) {
   setActiveNav(navBtn);
 }
 
+
+
+window.onload = async function () {
+
+  const now = new Date();
+
+  const h   = now.getHours();
+  const min = now.getMinutes();
+  const ss  = now.getSeconds();
+
+  const d   = now.getDate();
+  const mon = now.getMonth() + 1;
+  const yy  = now.getFullYear() % 100;
+
+  console.log(`Browser Time: ${h}:${min}:${ss}`);
+  console.log(`Browser Date: ${d}/${mon}/${yy}`);
+
+  // Send to ESP32
+  try {
+
+    await fetch('/api/set_time', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        hours: h,
+        minutes: min,
+        seconds: ss
+      })
+    });
+
+    await fetch('/api/set_date', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        day: d,
+        month: mon,
+        year: yy
+      })
+    });
+
+    console.log("RTC updated successfully");
+
+  } catch (err) {
+
+    console.error("Failed to update RTC:", err);
+
+  }
+};
+
+
 async function renderDashboard() {
 
   const wifiSelect = document.getElementById("dashboard-device-wifi");

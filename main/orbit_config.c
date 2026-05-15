@@ -129,6 +129,7 @@ orbit_err_t orbit_config_init(void){
 
     if(_nvs_load_settings() != ORBIT_OK)return ORBIT_ERR;
     if(_spiffs_init() != ORBIT_OK)return ORBIT_ERR;
+    if(_ds3231_init() != ORBIT_OK)return ORBIT_ERR;
     if(_network_init() != ORBIT_OK)return ORBIT_ERR;
     vTaskDelay(pdMS_TO_TICKS(500)); // prevent display issues
     if(g_sys_secure_info.wifi_enabled)_network_connect_to_wifi(g_sys_secure_info.wifi_ssid, g_sys_secure_info.wifi_pass);// do no care if it fails, user can fix in settings, plus what if the network is off? lol

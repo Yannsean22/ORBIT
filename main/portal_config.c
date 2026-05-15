@@ -139,6 +139,7 @@ static esp_err_t settings_set_settings_data_handler(httpd_req_t *req)
             break;
 
         case DEVICE_F1_CODEX:
+            printf("ferrari: %s\n", value); //debug print to verify value is being received correctly from UI
             change = settings_update_device_f1(value);
             break;
 

@@ -164,32 +164,6 @@ static bool _display_touch_read(int *out_x, int *out_y)
     return true;
 }
 
-
-//=========== DISPLAY TIME AND DATE HELPER ===========
-static char *_date_get(char *buf, size_t len){
-
-    time_t now;
-    struct tm timeinfo;
-
-    time(&now);
-    localtime_r(&now, &timeinfo);
-    strftime(buf, len, "%Y-%m-%d", &timeinfo);
-
-    return buf;
-}
-
-static char *_time_get(char *buf, size_t len){
-
-    time_t now;
-    struct tm timeinfo;
-
-    time(&now);
-    localtime_r(&now, &timeinfo);
-    strftime(buf, len, "%H:%M:%S", &timeinfo);
-
-    return buf;
-}
-
 //=============== DISPLAY MODULES ===============================
 
 //=========== Time Format ===========
@@ -198,10 +172,7 @@ static int _time_minute = 42;
 
 static void _time_get_string(char *buf, size_t len)
 {
-
-    char timebuf[16];
-    _time_get(timebuf, sizeof(timebuf));
-    snprintf(buf, len, "%s", timebuf);
+    snprintf(buf, len, "%s", _ds3231_get_time());
     vTaskDelay(pdMS_TO_TICKS(100)); //update time every second
 }
 
@@ -213,15 +184,8 @@ static int _date_weekday = 1;  // 0=SUN, 1=MON ... 6=SAT
 
 static void _date_get_string(char *buf, size_t len)
 {
-    const char *days[]   = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
-    const char *months[] = {"JAN","FEB","MAR","APR","MAY","JUN",
-                             "JUL","AUG","SEP","OCT","NOV","DEC"};
-    snprintf(buf, len, "%s  %s %d  %d",
-        days[_date_weekday],
-        months[_date_month - 1],
-        _date_day,
-        _date_year
-    );
+
+    snprintf(buf, len, "%s", _ds3231_get_date());
 }
 
 //=========== Astrophysics & General Facts ===========
@@ -531,7 +495,7 @@ static void _display_draw_text(const char *text, int x, int y, uint16_t color, u
         cursor_x -= 6 * scale;  // move left for next char
 
         // let FreeRTOS/IDLE run
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -610,23 +574,74 @@ static void _widget_date_update(int x, int y) //update just the clock text witho
     _display_draw_text(date_str, start_x, y, UI_WHITE, UI_BG, 1);
 }
 
+//=========== Widget: REMOVE ===========
+static void _clear_widget(int x, int y)
+{
+    // Clear full weather widget area
+    _display_draw_rect(x, y, 96, 96, UI_BG);
+}
+
 //=========== Widget: Weather ===========
+static int _c_to_f(int c)
+{
+    return (c * 9 / 5) + 32;
+}
 static void _widget_weather(int x, int y)
 {
-    _display_draw_text("WEATHER",   x, y,      UI_ACCENT, UI_BG, 1);
-    _display_draw_hline(x, y + 9, 50, UI_ACCENT);
-    _display_draw_text("Montreal",  x, y + 14, UI_WHITE,  UI_BG, 1);
-    _display_draw_text("-6 C",      x, y + 26, UI_WHITE,  UI_BG, 2);
-    _display_draw_text("Feels -12", x, y + 44, UI_GRAY,   UI_BG, 1);
-    _display_draw_text("Snowing",   x, y + 54, UI_GRAY,   UI_BG, 1);
+    if(wifi_connected) {
+        weather_fetch(&g_weather_data);
+    }
 
-    _display_draw_text("MON", x,      y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("-4",  x,      y + 80, UI_WHITE, UI_BG, 1);
-    _display_draw_text("TUE", x + 30, y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("-2",  x + 30, y + 80, UI_WHITE, UI_BG, 1);
-    _display_draw_text("WED", x + 60, y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("1",   x + 60, y + 80, UI_WHITE, UI_BG, 1);
+    orbit_weather_data_t *w = &g_weather_data;
+
+    _display_draw_text("WEATHER", x, y, UI_ACCENT, UI_BG, 1);
+    _display_draw_hline(x, y + 9, 50, UI_ACCENT);
+
+    if(!w->valid) {
+        _display_draw_text("Forecast", x, y + 14, UI_GRAY,  UI_BG, 1);
+        _display_draw_text("no data",  x, y + 26, UI_WHITE, UI_BG, 1);
+        return;
+    }
+
+    _display_draw_text(w->city, x, y + 14, UI_WHITE, UI_BG, 1);
+
+    char temp_str[16];
+    snprintf(temp_str, sizeof(temp_str), "%d F",
+             _c_to_f(w->temp_c));
+
+    _display_draw_text(temp_str, x, y + 26, UI_WHITE, UI_BG, 2);
+
+    char feels_str[16];
+    snprintf(feels_str, sizeof(feels_str), "Feels %d",
+             _c_to_f(w->feels_c));
+
+    _display_draw_text(feels_str, x, y + 44, UI_GRAY, UI_BG, 1);
+
+    _display_draw_text(w->condition, x, y + 54, UI_GRAY, UI_BG, 1);
+
+    char f0[8];
+    char f1[8];
+    char f2[8];
+
+    snprintf(f0, sizeof(f0), "%d",
+             _c_to_f(w->forecast[0].temp_max));
+
+    snprintf(f1, sizeof(f1), "%d",
+             _c_to_f(w->forecast[1].temp_max));
+
+    snprintf(f2, sizeof(f2), "%d",
+             _c_to_f(w->forecast[2].temp_max));
+
+    _display_draw_text(w->forecast[0].day, x,      y + 70, UI_GRAY,  UI_BG, 1);
+    _display_draw_text(f0,                x,      y + 80, UI_WHITE, UI_BG, 1);
+
+    _display_draw_text(w->forecast[1].day, x + 30, y + 70, UI_GRAY,  UI_BG, 1);
+    _display_draw_text(f1,                x + 30, y + 80, UI_WHITE, UI_BG, 1);
+
+    _display_draw_text(w->forecast[2].day, x + 60, y + 70, UI_GRAY,  UI_BG, 1);
+    _display_draw_text(f2,                x + 60, y + 80, UI_WHITE, UI_BG, 1);
 }
+
 
 
 //=============== WEATHER ICONS ===============================
@@ -752,19 +767,40 @@ static void _widget_stats(int x, int y)
 //=========== Widget: Packers ===========
 static void _widget_packers(int x, int y)
 {
-    _display_draw_text("PACKERS",   x, y, UI_PACKER_GREEN, UI_BG, 1);
-    _display_draw_hline(x, y + 9, 50, UI_PACKER_GREEN);
-    _display_draw_text("NFL 2025-26",  x, y + 14, UI_WHITE,  UI_BG, 1);
-    _display_draw_text("11-6",      x, y + 26, UI_WHITE,  UI_BG, 2);
-    _display_draw_text("NFC north", x, y + 44, UI_GRAY,   UI_BG, 1);
-    _display_draw_text("3rd place",   x, y + 54, UI_GRAY,   UI_BG, 1);
+    if(wifi_connected) {
+        packers_fetch(&g_packers_data);
+    }
 
-    _display_draw_text("LIO", x,      y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("W",  x,      y + 80, UI_PACKER_GREEN, UI_BG, 1);
-    _display_draw_text("VIK", x + 30, y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("L",  x + 30, y + 80, UI_RED, UI_BG, 1);
-    _display_draw_text("BEA", x + 60, y + 70, UI_GRAY,  UI_BG, 1);
-    _display_draw_text("W",   x + 60, y + 80, UI_PACKER_GREEN, UI_BG, 1);
+    orbit_packers_data_t *p = &g_packers_data;
+
+    _display_draw_text("PACKERS", x, y, UI_PACKER_GREEN, UI_BG, 1);
+    _display_draw_hline(x, y + 9, 50, UI_PACKER_GREEN);
+
+    if(!p->valid) {
+        _display_draw_text("NFL",     x, y + 14, UI_GRAY,  UI_BG, 1);
+        _display_draw_text("no data", x, y + 26, UI_WHITE, UI_BG, 1);
+        return;
+    }
+
+    _display_draw_text("GREEN BAY", x, y + 14, UI_WHITE, UI_BG, 1);
+
+    char matchup[32];
+    snprintf(matchup, sizeof(matchup), "GB vs %.10s", p->opponent);
+    _display_draw_text(matchup, x, y + 26, UI_WHITE, UI_BG, 1);
+
+    if(p->is_final) {
+        char score[24];
+        snprintf(score, sizeof(score), "%d-%d", p->packers_score, p->opponent_score);
+        _display_draw_text(score, x, y + 38, UI_WARN, UI_BG, 2);
+
+        _display_draw_text("Final", x, y + 58, UI_GRAY, UI_BG, 1);
+    } else {
+        _display_draw_text("NEXT GAME", x, y + 38, UI_WARN, UI_BG, 1);
+        _display_draw_text(p->date,     x, y + 50, UI_WHITE, UI_BG, 1);
+    }
+
+    _display_draw_text("STATUS",  x,      y + 70, UI_GRAY,  UI_BG, 1);
+    _display_draw_text(p->status, x,      y + 80, UI_WHITE, UI_BG, 1);
 }
 
 //=========== Widget: Ferrari ===========
@@ -892,15 +928,29 @@ static void _display_pos_top_middle(){
 
 
 static void _display_pos_mid_left(int x, int y){
-        _widget_weather(x, y);
+        if(update_weather_flag == 1){
+            _clear_widget(x, y); // clear old data before redraw to prevent artifacts
+            _widget_weather(x, y);
+            update_weather_flag = 0; // reset flag until next update is needed
+        }
 }
 
 static void _display_pos_mid_center(int x, int y){
-        _widget_f1(x, y);
+        if(update_f1_flag == 1){
+            _clear_widget(x, y); // reuse same clear function since f1 widget is same size as weather
+            _widget_f1(x, y);
+            update_f1_flag = 0; // reset flag until next update is needed
+        }
 }
 
 static void _display_pos_mid_right(int x, int y){
-        _widget_packers(x, y);
+        if(update_packers_flag == 1){
+            _clear_widget(x, y); // reuse same clear function since packers widget is same size as weather
+            _widget_packers(x, y);
+            update_packers_flag = 0; // reset flag until next update is needed
+        }
+
+
 }
 
 
@@ -948,58 +998,38 @@ void _draw_page1_task(void *vpParam)
 
     // draw static stuff once 
     _display_draw_hline(0, 50, LCD_WIDTH, UI_WHITE);
-    // _display_pos_mid_left(DISPLAY_POSITION_MIDDLE_LEFT_X, DISPLAY_POSITION_MIDDLE_LEFT_Y);
-    // _display_pos_mid_right(DISPLAY_POSITION_MIDDLE_RIGHT_X, DISPLAY_POSITION_MIDDLE_RIGHT_Y);
 
     _display_pos_bottom_middle(); //button
 
     vTaskDelay(pdMS_TO_TICKS(100)); // small delay to ensure above draws before updates start
-    _display_pos_mid_center(DISPLAY_POSITION_MIDDLE_CENTER_X, DISPLAY_POSITION_MIDDLE_CENTER_Y);
 
 
     while (1)
     {
-
         _widget_wifi_update(DISPLAY_POSITION_TOP_LEFT_X_LV0, DISPLAY_POSITION_TOP_LEFT_Y_LV0);
         _widget_settings_update(DISPLAY_POSITION_TOP_LEFT_X_LV1, DISPLAY_POSITION_TOP_LEFT_Y_LV1);
         _widget_clock_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV0, DISPLAY_POSITION_TOP_MIDDLE_Y_LV0);
         _widget_date_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV1, DISPLAY_POSITION_TOP_MIDDLE_Y_LV1);
 
+        _display_pos_mid_left(DISPLAY_POSITION_MIDDLE_LEFT_X, DISPLAY_POSITION_MIDDLE_LEFT_Y);
+
+        _display_pos_mid_center(DISPLAY_POSITION_MIDDLE_CENTER_X, DISPLAY_POSITION_MIDDLE_CENTER_Y);
+
+        _display_pos_mid_right(DISPLAY_POSITION_MIDDLE_RIGHT_X, DISPLAY_POSITION_MIDDLE_RIGHT_Y);
+
         _display_pos_single_point(DISPLAY_POSITION_SINGLE_POINT_X,
                                   DISPLAY_POSITION_SINGLE_POINT_Y);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(1000)); // update every 500m
     }
-}
-
-void _time_widget_task(void *vpParam){
-
-
-    while (1)
-    {
-
-        vTaskDelay(pdMS_TO_TICKS(500));// every seconds but offset to since we have stop in these calls
-    }
-
-}
-
-void _date_widget_task(void *vpParam){
-
-    while (1)
-    {
-        // _widget_date_update(DISPLAY_POSITION_TOP_MIDDLE_X_LV1,
-        //                     DISPLAY_POSITION_TOP_MIDDLE_Y_LV1);
-
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60));// every minute
-    }
-
 }
 
 void _weather_widget_task(void *vpParam){
 
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+        update_weather_flag = 1; // set flag to trigger weather update in main page task
+        vTaskDelay(pdMS_TO_TICKS(1000 * 5));// every 5 minutes
     }
 
 }
@@ -1008,7 +1038,8 @@ void _f1_widget_task(void *vpParam){
 
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+        update_f1_flag = 1; // set flag to trigger f1 update in main page task
+        vTaskDelay(pdMS_TO_TICKS(1000 * 5));// every 5 minutes
     }
 
 }
@@ -1017,14 +1048,16 @@ void _packers_widget_task(void *vpParam){
     
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15));// every 15 minutes
+        update_packers_flag = 1; // set flag to trigger packers update in main page task
+        vTaskDelay(pdMS_TO_TICKS(1000 * 5));// every 5 minutes
     }
 }
 
 void _fun_fact_timer_task(void *vpParam){
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60));// every minutes
+        update_fun_fact_flag = 1; // set flag to trigger fun fact update in main page task
+        vTaskDelay(pdMS_TO_TICKS(1000 * 15));// every 15 seconds
     }
 }
 
