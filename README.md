@@ -2,7 +2,7 @@
 # ORBIT
 
 ```
-CURRENT STATUES : In-Progress -- almost done, need some fixes on the portal side of things
+CURRENT STATUS : In-Progress -- almost done, need some fixes on the portal side of things
 ```
 
 THIS WAS A SEMI COPY OF 'ZAIRE SYSTEM' ANOTHER PROJECT I WORKED ON(MUCH MORE ADVANCED AND BETTER IN MY OPINION). 
