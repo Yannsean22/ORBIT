@@ -2,7 +2,7 @@
 # ORBIT
 
 ```
-CURRENT STATUS : In-Progress -- almost done, need some fixes on the portal side of things
+CURRENT STATUS : DONE TO MY SATISFACTION 
 ```
 
 THIS WAS A SEMI COPY OF 'ZAIRE SYSTEM' ANOTHER PROJECT I WORKED ON(MUCH MORE ADVANCED AND BETTER IN MY OPINION). 
@@ -79,6 +79,14 @@ Change:
 2MB -> 4MB
 ```
 
+## FLASH SPI SPEED - BETTER PERMONANCE IN MY OPINION
+
+Change:
+
+```txt
+40 MHZ -> 80 MHZ
+```
+
 Location:
 
 ```txt
@@ -129,6 +137,16 @@ idf.py flash monitor
 ```
 
 ---
+
+##### Optional but I prefer doing this at release:
+
+```
+Component config → ESP System Settings → Channel for console output: NONE
+```
+
+```
+Component config → Log output → Default log verbosity
+```
 
 # FEATURES
 
