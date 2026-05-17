@@ -1,6 +1,5 @@
 idf_component_register(SRCS 
 
-
                 "packers_config.c"
                 "weather_config.c"
                 "DS3231_config.c"

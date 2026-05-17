@@ -33,28 +33,20 @@ window.onload = async function () {
   // Send to ESP32
   try {
 
-    await fetch('/api/set_time', {
+    await fetch('/settings_set_settings_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        hours: h,
-        minutes: min,
-        seconds: ss
-      })
+      body: JSON.stringify(`&${CODEX.UPDATE_TIME}&${h}&${min}&${ss}&`)
     });
 
-    await fetch('/api/set_date', {
+    await fetch('/settings_set_settings_data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        day: d,
-        month: mon,
-        year: yy
-      })
+      body: JSON.stringify(`&${CODEX.UPDATE_DATE}&${d}&${mon}&${yy}&`)
     });
 
     console.log("RTC updated successfully");

@@ -64,7 +64,7 @@
 #include "cJSON.h"
 
 //BUZZER
-#define BUZZER_PIN          GPIO_NUM_26
+#define BUZZER_PIN          GPIO_NUM_27
 #define BUZZER_CHANNEL      LEDC_CHANNEL_0
 #define BUZZER_TIMER        LEDC_TIMER_0
 #define BUZZER_SPEED_MODE   LEDC_LOW_SPEED_MODE
@@ -78,7 +78,7 @@ void error_beep(void);
 
 extern bool update_time_flag; // if true, clock will update time then turn off runs every second
 extern bool update_fun_fact_flag; // if true, fun fact will update then turn off runs every 3 minute
-extern bool update_full_recycle_flag; // if true, full recycle will update then turn off runs every hour
+extern bool update_full_recycle_flag; // very important... this only acts when our fetching of f1, weather, or packers fails then we resest esp every 15 minutes
 extern bool update_weather_flag; // if true, weather will update then turn off runs every 5 minutes
 extern bool update_f1_flag; // if true, F1 will update then turn off runs every 5 minutes
 extern bool update_packers_flag; // if true, packers will update then turn off runs every 5 minutes

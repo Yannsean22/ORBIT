@@ -167,6 +167,26 @@ static esp_err_t settings_set_settings_data_handler(httpd_req_t *req)
 
             break;
 
+        case UPDATE_TIME:
+        
+            uint8_t h = (uint8_t)atoi(parts[2]);
+            uint8_t m = (uint8_t)atoi(parts[3]);
+            uint8_t s = (uint8_t)atoi(parts[4]);
+            change = _ds3231_set_time(h, m, s);
+            printf("time: %d-%d-%d\n",h, m, s);
+            
+            break;
+
+        case UPDATE_DATE:
+
+            uint8_t d = (uint8_t)atoi(parts[2]);
+            uint8_t mon = (uint8_t)atoi(parts[3]);
+            uint8_t yy = (uint8_t)atoi(parts[4]);
+            change = _ds3231_set_date(d, mon, yy);
+            printf("time: %d-%d-%d\n",d, mon, yy);
+            
+            break;
+
         default:
             printf("Unknown codex: %u\n", key);
             break;

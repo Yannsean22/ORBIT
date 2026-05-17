@@ -15,8 +15,8 @@ void _rst_whole_sys_task(void *vpParam){
 
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 60)); //restart system every hours
-        esp_restart();
+        vTaskDelay(pdMS_TO_TICKS(1000 * 60 * 15)); //restart system every 15 minutes if fetcing f1, weater, packers fails
+        if(update_full_recycle_flag == 1)esp_restart();
     }
     
 

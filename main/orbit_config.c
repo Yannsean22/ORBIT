@@ -99,6 +99,7 @@ static orbit_err_t _nvs_load_settings(void){
 
 orbit_err_t orbit_config_init(void){
 
+    if(buzzer_init() != ORBIT_OK)return ORBIT_ERR;
     if(nvs_init() != ORBIT_OK)return ORBIT_ERR;
     orbit_err_t err = nvs_read_blob(sys_handle, NVS_KEY_SYSTEM_SECURE, &g_sys_secure_info, sizeof(g_sys_secure_info));
     if (err != ORBIT_OK){

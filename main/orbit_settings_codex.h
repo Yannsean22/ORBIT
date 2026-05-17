@@ -31,4 +31,8 @@
 #define ADV_WIFIS_CODEX                            0xC0 //used to send available wifi SSIDs to portal for display
 #define CON_WIFI_CODEX                             0xC1 //used to send selected wifi SSID and password for connection
 
+
+#define UPDATE_TIME                                0xF6
+#define UPDATE_DATE                                0xF9
+
 #endif // ZAIRE_SYSTEMS_PORTAL_SETTINGS_CODEX_H

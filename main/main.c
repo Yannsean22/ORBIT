@@ -38,8 +38,7 @@ void app_main(void)
     xTaskCreate(_rst_whole_sys_task, "_rst_whole_sys_task", 1024, NULL, 10, NULL);
     
 
-    printf("f1: %d\n", g_system_prefs.f1); // for debugging, shows that f1 data is being fetched and stored correctly
-
+    shutdown_beep();
     _display_main_UI();
 
 }

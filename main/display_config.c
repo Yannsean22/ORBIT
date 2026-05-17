@@ -598,6 +598,7 @@ static void _widget_weather(int x, int y)
     _display_draw_hline(x, y + 9, 50, UI_ACCENT);
 
     if(!w->valid) {
+        update_full_recycle_flag = 1; //activate rst data
         _display_draw_text("Forecast", x, y + 14, UI_GRAY,  UI_BG, 1);
         _display_draw_text("no data",  x, y + 26, UI_WHITE, UI_BG, 1);
         return;
@@ -777,6 +778,7 @@ static void _widget_packers(int x, int y)
     _display_draw_hline(x, y + 9, 50, UI_PACKER_GREEN);
 
     if(!p->valid) {
+        update_full_recycle_flag = 1; //activate rst
         _display_draw_text("NFL",     x, y + 14, UI_GRAY,  UI_BG, 1);
         _display_draw_text("no data", x, y + 26, UI_WHITE, UI_BG, 1);
         return;
@@ -829,6 +831,7 @@ static void _widget_f1(int x, int y)
 
     if(!has_data){
         // no data state
+        update_full_recycle_flag = 1; // activate rst
         _display_draw_text("Constructor", x, y + 14, UI_GRAY,  UI_BG, 1);
         _display_draw_text("no data",     x, y + 24, UI_WHITE, UI_BG, 1);
         return;
@@ -1079,11 +1082,12 @@ void _display_main_UI(void)
                 if(is_settings_portal_on == 0){
                     if(_network_settings_mode() == ORBIT_OK)start_dns_server(); // start captive portal DNS server to redirect to settings page
                     is_settings_portal_on = 1; // set flag to indicate portal is active
-
+                    double_beep();
 
                 }else{
                     stop_dns_server(); // stop DNS server when exiting settings
                     is_settings_portal_on = 0; // reset flag
+                    single_beep();
                 }
 
             }else{

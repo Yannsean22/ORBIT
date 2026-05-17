@@ -31,6 +31,9 @@ const CODEX = Object.freeze({
 
   ADV_WIFIS: 0xC0, //used to send available wifi SSIDs to portal for display
   CON_WIFI: 0xC1, //used to send selected wifi SSID and password for connection
+
+  UPDATE_TIME: 0xF6,
+  UPDATE_DATE: 0xF9
 });
 
 //SYSTEM SETTINGS

@@ -125,8 +125,8 @@ orbit_err_t _spiffs_init(void);
 // I2C PINS
 //======================
 #define I2C_NUM         I2C_NUM_0
-#define I2C_SDA_PIN     GPIO_NUM_22
-#define I2C_SCL_PIN     GPIO_NUM_21
+#define I2C_SDA_PIN     GPIO_NUM_21
+#define I2C_SCL_PIN     GPIO_NUM_22
 orbit_err_t _ds3231_init(void);
 char* _ds3231_get_time(void);
 char* _ds3231_get_date(void);
