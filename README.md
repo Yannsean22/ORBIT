@@ -193,5 +193,5 @@ Some systems are experimental and subject to change.
 # AUTHOR
 
 Yann Kabambi  
-contact@yannkabambi.com
+contact@yannkabambi.com <br/>
 https://www.yannkabambi.com/orbit
