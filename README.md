@@ -14,6 +14,10 @@ BUT I LEFT IT IN FOR NOW AS A REFERENCE FOR ANY FUTURE SETTINGS I MAY WANT TO AD
 ORBIT is an ESP32 embedded platform and dashboard system built using ESP-IDF.  
 It is designed as a lightweight embedded UI/portal framework featuring:
 
+#### THIS IS NOT A COMMERCIAL PRODUCT
+#### PLEASE UTILIZE THIS PROJECT AS A STARTING POINT 
+#### THIS COMES AS IS, MAY OR MAY NOT BE UPDATED IN THE FUTURE
+
 - Captive portal setup
 - Embedded dashboard UI
 - Settings management
