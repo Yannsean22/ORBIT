@@ -181,12 +181,12 @@ Component config → Log output → Default log verbosity
  * There are 2 ext GPIO ports, we will be using both, one for the beeper, one for the I2C
  * I2C: port with 3.3v
  * Beeper: port without 3.3v
-   <img src="images/IMG_5148.JPG" width="50">
-   <img src="images/IMG_5149.JPG" width="50">
+   <img src="images/IMG_5148.JPEG" width="50">
+   <img src="images/IMG_5149.JPEG" width="50">
 
 
 # FINAL LOOK - NO HOMEMADE COVER
-   <img src="images/IMG_5151.JPG" width="10">
+   <img src="images/IMG_5151.JPEG" width="10">
 
 
 # PIC EXAMPLES
